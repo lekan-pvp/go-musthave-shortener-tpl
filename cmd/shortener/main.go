@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/app/shorter"
 	"io"
 	"log"
 	"net/http"
