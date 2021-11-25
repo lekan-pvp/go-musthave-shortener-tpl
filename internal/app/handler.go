@@ -33,31 +33,19 @@ func (h *handler) Register(router chi.Router) {
 
 
 func (h *handler) GetURLByID(w http.ResponseWriter, r *http.Request) {
-	articleID := r.URL.Path
-	key := prefix[:len(prefix)-1]+articleID
-	log.Println(key)
-	//
+	articleID := chi.URLParam(r, "articleID")
+	key := prefix+articleID
+
 	longURL := h.store.Get(key)
-	log.Println(longURL)
 
+	if longURL == "" {
+		http.Error(w, "Wrong id", 400)
+		return
+	}
 
-	//id, err := strconv.Atoi(param)
-	//log.Println(id)
-	//if err != nil {
-	//	http.Error(w, "Wrong", 400)
-	//	return
-	//}
-	//
-	//long := shorts[id].Long
-	//log.Println(long)
-	//if long == "" {
-	//	http.Error(w, "Wrong id", 400)
-	//	return
-	//}
-	//w.Header().Set("Content-Type", "text/plain")
-	//w.Header().Set("Location", long)
-	//w.WriteHeader(http.StatusTemporaryRedirect)
-	w.Write([]byte("get"))
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Location", longURL)
+	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
 func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,8 +62,9 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusCreated)
 
 	short := h.store.Put(long)
-	long = h.store.Get(short)
-	log.Printf("%s\n", h.store.db[short])
+
+
+	log.Printf("%v: %v\n", short, h.store.db[short])
 	w.Write([]byte(short))
 }
 
