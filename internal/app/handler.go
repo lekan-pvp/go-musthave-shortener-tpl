@@ -74,7 +74,8 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusCreated)
 
 	short := h.store.Put(long)
-	log.Printf("%s", h.store.Get(short))
+	long = h.store.Get(short)
+	log.Printf("%s\n", h.store.db[short])
 	w.Write([]byte(short))
 }
 
