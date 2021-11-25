@@ -5,7 +5,6 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/app"
 	"log"
 	"net/http"
-
 )
 
 func main() {

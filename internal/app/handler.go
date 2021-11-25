@@ -34,7 +34,7 @@ func (h *handler) Register(router chi.Router) {
 
 func (h *handler) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "articleID")
-	key := prefix+articleID
+	key := prefix +articleID
 
 	longURL := h.store.Get(key)
 
@@ -47,6 +47,7 @@ func (h *handler) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", longURL)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
+
 
 func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
