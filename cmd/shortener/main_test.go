@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/app/shorter"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/app"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -45,7 +45,7 @@ func TestGetURLByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			for _, tt := range tests {
-				short := shorter.Shorting(1)
+				short := app.Shorting(1)
 				shorts[tt.id] = URLs{
 					Long: tt.long,
 					Short: short,
