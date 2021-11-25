@@ -1,4 +1,4 @@
-package app
+package shortener
 
 type Store struct {
 	db map[string]string
