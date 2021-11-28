@@ -1,6 +1,11 @@
 package shortener
 
+import (
+	"sync"
+)
+
 type Store struct {
+	mx sync.Mutex
 	db map[string]string
 }
 
@@ -10,15 +15,21 @@ type Storer interface {
 }
 
 func NewStore() *Store  {
-	store := &Store{db: map[string]string{}}
-	return store
+	return &Store{
+		db: make(map[string]string),
+	}
 }
 
-func (s *Store) Get(uuid string) string {
-	return s.db[uuid]
+func (s *Store) Get(uuid string) (string, bool) {
+	s.mx.Lock()
+	defer s.mx.Unlock()
+	val, ok := s.db[uuid]
+	return val, ok
 }
 
 func (s *Store) Put(URL string) string{
+	s.mx.Lock()
+	defer s.mx.Unlock()
 	id := Shorting()
 	s.db[id] = URL
 	return id

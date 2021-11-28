@@ -36,9 +36,8 @@ func (h *handler) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "articleID")
 	key := prefix +articleID
 
-	longURL := h.store.Get(key)
-
-	if longURL == "" {
+	longURL, ok := h.store.Get(key)
+	if !ok {
 		http.Error(w, "Wrong id", 400)
 		return
 	}
