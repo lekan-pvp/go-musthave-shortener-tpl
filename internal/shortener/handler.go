@@ -63,36 +63,34 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write([]byte(short))
 }
 
-type ApiShortenBody struct {
-	URL string `json:"-"`
-	Result string `json:"result,omitempty"`
+type BodyRequest struct {
+	URL string `json:"url"`
+}
+
+type BodyResponse struct {
+	Result string `json:"result"`
 }
 
 // ApiShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
 func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
-	var v ApiShortenBody
+	var res BodyResponse
+	var req BodyRequest
 
-	body, err := io.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(),500)
-		return
-	}
-
-	if err := json.Unmarshal(body, &v); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	defer r.Body.Close()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Location", v.URL)
+	w.Header().Set("Location", req.URL)
 	w.WriteHeader(http.StatusCreated)
 
-	short := h.store.Put(v.URL)
+	short := h.store.Put(req.URL)
 
-	v.Result = short
+	res.Result = short
 
-	result, err := json.Marshal(v)
+	result, err := json.Marshal(res)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
