@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func Test_handler_GetURLByID(t *testing.T) {
+func Test_handler_GetURLByIDHandler(t *testing.T) {
 	type fields struct {
 		store *Store
 	}
@@ -61,7 +61,7 @@ func Test_handler_GetURLByID(t *testing.T) {
 			}
 			router := chi.NewRouter()
 			router.Route("/{articleID}", func(r chi.Router) {
-				r.Get("/", h.GetURLByID)
+				r.Get("/", h.GetURLByIDHandler)
 			})
 
 			req := httptest.NewRequest(http.MethodGet, tt.request, nil)
