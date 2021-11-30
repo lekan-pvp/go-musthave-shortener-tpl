@@ -3,35 +3,26 @@ package shortener
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/handlers"
 	"io"
 	"log"
 	"net/http"
 )
 
-var _ handlers.Handler = &handler{}
 
-const (
-	createURL = "/"
-	getURL = "/{articleID}"
-	apiShorten = "/api/shorten"
-)
 
 type handler struct {
-	store *Store
+	store *MemoryStore
 }
 
-func NewHandler() handlers.Handler {
+func NewHandler() *handler {
 	store := NewStore()
 	return &handler{store: store}
 }
 
 func (h *handler) Register(router chi.Router) {
-	router.Post(createURL, h.CreateShortURLHandler)
-	router.Route(getURL, func(r chi.Router) {
-		r.Get("/", h.GetURLByIDHandler)
-	})
-	router.Post(apiShorten, h.ApiShortenHandler)
+	router.Post("/", h.CreateShortURLHandler)
+	router.Get("/{articleID}", h.GetURLByIDHandler)
+	router.Post("/api/shorten", h.ApiShortenHandler)
 }
 
 
@@ -40,9 +31,9 @@ func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "articleID")
 	key := prefix +articleID
 
-	longURL, ok := h.store.Get(key)
-	if !ok {
-		http.Error(w, "Wrong id", 400)
+	longURL, err := h.store.Get(key)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
 		return
 	}
 
@@ -53,8 +44,8 @@ func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 
 // GetURLByIDHandler -- создает короткий URL и сохраняет в локальном хранилище
 func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
 	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -80,8 +71,9 @@ type ApiShortenBody struct {
 // ApiShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
 func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
 	var v ApiShortenBody
-	defer r.Body.Close()
+
 	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(),500)
 		return

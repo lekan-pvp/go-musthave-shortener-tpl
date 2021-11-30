@@ -10,7 +10,7 @@ import (
 
 func Test_handler_GetURLByIDHandler(t *testing.T) {
 	type fields struct {
-		store *Store
+		store *MemoryStore
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -31,7 +31,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			name: "success test",
 			request: "http://localhost:8080/XVlBz",
 			fields: fields{
-				store: &Store{
+				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
 			},
@@ -44,7 +44,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			name: "not found",
 			request: "http://localhost:8080/1",
 			fields: fields{
-				store: &Store{
+				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
 			},
@@ -81,7 +81,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 
 func Test_handler_CreateShortURLHandler(t *testing.T) {
 	type fields struct {
-		store *Store
+		store *MemoryStore
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -90,6 +90,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 	type want struct {
 		contentType string
 		statusCode int
+		body string
 	}
 	tests := []struct {
 		name   string
@@ -102,7 +103,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			name: "success test",
 			request: "/",
 			fields: fields{
-				store: &Store{
+				store: &MemoryStore{
 					db: map[string]string{"":""},
 				},
 			},
@@ -140,6 +141,8 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
 
 			assert.Equal(t, tt.want.statusCode, result.StatusCode)
+
+			assert.NotEmpty(t, result.Body)
 
 		})
 	}

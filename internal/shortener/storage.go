@@ -1,33 +1,32 @@
 package shortener
 
 import (
+	"errors"
 	"sync"
 )
 
-type Store struct {
+type MemoryStore struct {
 	mx sync.Mutex
 	db map[string]string
 }
 
-type Storer interface {
-	Get(string) string
-	Put(string) string
-}
-
-func NewStore() *Store  {
-	return &Store{
+func NewStore() *MemoryStore  {
+	return &MemoryStore{
 		db: make(map[string]string),
 	}
 }
 
-func (s *Store) Get(uuid string) (string, bool) {
+func (s *MemoryStore) Get(uuid string) (string, error) {
 	s.mx.Lock()
 	defer s.mx.Unlock()
 	val, ok := s.db[uuid]
-	return val, ok
+	if !ok {
+		return "", errors.New("short URL not found ")
+	}
+	return val, nil
 }
 
-func (s *Store) Put(URL string) string{
+func (s *MemoryStore) Put(URL string) string{
 	s.mx.Lock()
 	defer s.mx.Unlock()
 	id := Shorting()
