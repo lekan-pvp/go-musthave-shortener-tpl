@@ -81,11 +81,17 @@ type ApiShortenBody struct {
 func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
 	var v ApiShortenBody
 	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, err.Error(),500)
+		return
+	}
 
-	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
+	if err := json.Unmarshal(body, &v); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
 
@@ -93,7 +99,10 @@ func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
 
 	v.Result = short
 
-	if err := json.NewEncoder(w).Encode(v); err != nil {
-		panic(err)
+	result, err := json.Marshal(v)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
 	}
+	w.Write(result)
 }
