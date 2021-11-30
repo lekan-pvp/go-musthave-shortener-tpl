@@ -12,6 +12,8 @@ import (
 
 type handler struct {
 	store *MemoryStore
+	url BodyRequest
+	result BodyResponse
 }
 
 func NewHandler() *handler {
@@ -63,34 +65,24 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	w.Write([]byte(short))
 }
 
-type BodyRequest struct {
-	URL string `json:"url"`
-}
-
-type BodyResponse struct {
-	Result string `json:"result"`
-}
-
 // ApiShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
 func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
-	var res BodyResponse
-	var req BodyRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&h.url); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	defer r.Body.Close()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Location", req.URL)
+	w.Header().Set("Location", h.url.URL)
 	w.WriteHeader(http.StatusCreated)
 
-	short := h.store.Put(req.URL)
+	short := h.store.Put(h.url.URL)
 
-	res.Result = short
+	h.result.Result = short
 
-	result, err := json.Marshal(res)
+	result, err := json.Marshal(h.result)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
