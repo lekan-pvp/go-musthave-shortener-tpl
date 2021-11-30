@@ -93,6 +93,7 @@ func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.Header().Set("Location", v.URL)
 	w.WriteHeader(http.StatusCreated)
 
 	short := h.store.Put(v.URL)
