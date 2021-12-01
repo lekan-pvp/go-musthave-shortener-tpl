@@ -66,7 +66,7 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 // ApiShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
-func (h *handler) ApiShortenHandler(w http.ResponseWriter, r *http.Request)  {
+func (h *handler) APIShortenHandler(w http.ResponseWriter, r *http.Request)  {
 
 	if err := json.NewDecoder(r.Body).Decode(&h.url); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
