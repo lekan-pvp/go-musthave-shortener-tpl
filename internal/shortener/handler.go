@@ -24,7 +24,7 @@ func NewHandler() *handler {
 func (h *handler) Register(router chi.Router) {
 	router.Post("/", h.CreateShortURLHandler)
 	router.Get("/{articleID}", h.GetURLByIDHandler)
-	router.Post("/api/shorten", h.ApiShortenHandler)
+	router.Post("/api/shorten", h.APIShortenHandler)
 }
 
 
