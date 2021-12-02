@@ -166,12 +166,14 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 	}
 	tests := []struct {
 		name   string
+		endppoint string
 		fields fields
 		args   args
 		want want
 	}{
 		{
 			name: "success test",
+			endppoint: "/api/shorten",
 			fields: fields{
 				store: &MemoryStore{
 					db: map[string]string{"":""},
@@ -187,7 +189,25 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 				contentType: "application/json; charset=UTF-8",
 				statusCode: 201,
 			},
-
+		},
+		{
+			name: "wrong endpoint",
+			endppoint: "/wrong",
+			fields: fields{
+				store: &MemoryStore{
+					db: map[string]string{"":""},
+				},
+				url: BodyRequest{
+					GoalURL: "http://google.com",
+				},
+				result: BodyResponse{
+					ResultURL: "http://localhost:8080/gbaiC",
+				},
+			},
+			want: want{
+				contentType: "text/plain; charset=utf-8",
+				statusCode: 404,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -207,7 +227,7 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 				return
 			}
 
-			req := httptest.NewRequest(http.MethodPost, "/api/shorten", bytes.NewBuffer([]byte(txBz)))
+			req := httptest.NewRequest(http.MethodPost, tt.endppoint, bytes.NewBuffer([]byte(txBz)))
 			req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 			rr := httptest.NewRecorder()

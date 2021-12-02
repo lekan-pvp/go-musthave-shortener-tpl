@@ -17,7 +17,9 @@ type handler struct {
 
 func NewHandler() *handler {
 	store := NewStore()
-	return &handler{store: store}
+	return &handler{
+		store: store,
+	}
 }
 
 func (h *handler) Register(router chi.Router) {
