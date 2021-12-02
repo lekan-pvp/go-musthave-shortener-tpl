@@ -60,17 +60,17 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 				store: tt.fields.store,
 			}
 			router := chi.NewRouter()
-			router.Route("/{articleID}", func(r chi.Router) {
-				r.Get("/", h.GetURLByIDHandler)
-			})
+			router.Get("/{articleID}", h.GetURLByIDHandler)
 
 			req := httptest.NewRequest(http.MethodGet, tt.request, nil)
 
 			rr := httptest.NewRecorder()
+
 			router.ServeHTTP(rr, req)
 
 			result := rr.Result()
 			defer result.Body.Close()
+
 			assert.Equal(t, tt.want.statusCode, result.StatusCode)
 
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
@@ -136,7 +136,6 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			router.ServeHTTP(rr, req)
 
 			result := rr.Result()
-			defer result.Body.Close()
 
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
 
@@ -147,3 +146,4 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 		})
 	}
 }
+

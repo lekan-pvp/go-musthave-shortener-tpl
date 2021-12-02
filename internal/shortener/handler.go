@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -22,9 +21,10 @@ func NewHandler() *handler {
 }
 
 func (h *handler) Register(router chi.Router) {
+	router.Post("/api/shorten", h.APIShortenHandler)
 	router.Post("/", h.CreateShortURLHandler)
 	router.Get("/{articleID}", h.GetURLByIDHandler)
-	router.Post("/api/shorten", h.APIShortenHandler)
+
 }
 
 
@@ -44,7 +44,7 @@ func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 
-// GetURLByIDHandler -- создает короткий URL и сохраняет в локальном хранилище
+// CreateShortURLHandler -- создает короткий URL и сохраняет в локальном хранилище
 func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -61,11 +61,11 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	short := h.store.Put(long)
 
 
-	log.Printf("%v: %v\n", short, h.store.db[short])
+	//log.Printf("%v: %v\n", short, h.store.db[short])
 	w.Write([]byte(short))
 }
 
-// ApiShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
+// APIShortenHandler -- принимает и возвращает объекты JSON в теле запроса и ответа
 func (h *handler) APIShortenHandler(w http.ResponseWriter, r *http.Request)  {
 
 	if err := json.NewDecoder(r.Body).Decode(&h.url); err != nil {
@@ -75,17 +75,17 @@ func (h *handler) APIShortenHandler(w http.ResponseWriter, r *http.Request)  {
 	defer r.Body.Close()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Location", h.url.URL)
+	//w.Header().Set("Location", h.url.GoalURL)
 	w.WriteHeader(http.StatusCreated)
 
-	short := h.store.Put(h.url.URL)
+	short := h.store.Put(h.url.GoalURL)
 
-	h.result.Result = short
+	h.result.ResultURL = short
 
 	result, err := json.Marshal(h.result)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	w.Write(result)
+	w.Write([]byte(result))
 }

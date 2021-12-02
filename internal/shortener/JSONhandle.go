@@ -2,9 +2,9 @@ package shortener
 
 
 type BodyRequest struct {
-	URL string `json:"url"`
+	GoalURL string `json:"url"`
 }
 
 type BodyResponse struct {
-	Result string `json:"result"`
+	ResultURL string `json:"result"`
 }
