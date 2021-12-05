@@ -2,6 +2,7 @@ package shortener
 
 import (
 	"errors"
+	"log"
 	"sync"
 )
 
@@ -26,10 +27,10 @@ func (s *MemoryStore) Get(uuid string) (string, error) {
 	return val, nil
 }
 
-func (s *MemoryStore) Put(URL string) string{
+func (s *MemoryStore) Put(URL string, shortURL string) string{
+	log.Println(shortURL)
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	id := Shorting()
-	s.db[id] = URL
-	return id
+	s.db[shortURL] = URL
+	return shortURL
 }
