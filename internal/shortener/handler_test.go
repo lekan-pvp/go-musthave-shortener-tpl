@@ -3,7 +3,9 @@ package shortener
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/go-chi/chi/v5"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/config"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -32,20 +34,20 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 	}{
 		{
 			name: "success test",
-			request: "http://localhost:8080/XVlBz",
+			request: "XVlBz",
 			fields: fields{
 				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
 			},
 			want: want{
-				contentType: "text/plain",
+				contentType: "text/plain; charset=utf-8",
 				statusCode: 307,
 			},
 		},
 		{
 			name: "not found",
-			request: "http://localhost:8080/1",
+			request: "1",
 			fields: fields{
 				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
@@ -62,10 +64,16 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			h := &handler{
 				store: tt.fields.store,
 			}
+
 			router := chi.NewRouter()
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
-			req := httptest.NewRequest(http.MethodGet, tt.request, nil)
+			cfg := config.GetConfig()
+
+			request := fmt.Sprintf("%s%s", cfg.BaseURL, tt.request)
+			log.Println(request)
+
+			req := httptest.NewRequest(http.MethodGet, request, nil)
 
 			rr := httptest.NewRecorder()
 

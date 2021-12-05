@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/config"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -36,8 +37,8 @@ func (h *handler) Register(router chi.Router) {
 // GetURLByIDHandler -- возвращает длинный URL из локального хранилища по ключу, которым является короткий URL
 func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "articleID")
-	key := h.baseURL +articleID
-
+	key := h.baseURL + articleID
+	log.Println("from handler baseURL: ", h.baseURL)
 	longURL, err := h.store.Get(key)
 	if err != nil {
 		http.Error(w, err.Error(), 400)

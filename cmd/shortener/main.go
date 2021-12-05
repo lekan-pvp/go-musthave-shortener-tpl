@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener"
@@ -24,7 +23,7 @@ func main() {
 	log.Println("start application")
 	log.Println("server is listening port", cfg.ServerAddress)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", cfg.ServerAddress, "8080"), router))
+	log.Fatal(http.ListenAndServe(cfg.ServerAddress, router))
 }
 
 
