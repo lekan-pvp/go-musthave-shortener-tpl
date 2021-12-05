@@ -79,7 +79,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
 
-			request := fmt.Sprintf("%s%s",h.baseURL , tt.request)
+			request := fmt.Sprintf("%s/%s",h.baseURL , tt.request)
 
 			req := httptest.NewRequest(http.MethodGet, request, nil)
 
