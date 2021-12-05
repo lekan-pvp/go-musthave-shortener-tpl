@@ -17,7 +17,7 @@ func main() {
 
 	cfg := config.GetConfig()
 
-	handler := shortener.NewHandler()
+	handler := shortener.NewHandler(cfg)
 	handler.Register(router)
 
 	log.Println("start application")
