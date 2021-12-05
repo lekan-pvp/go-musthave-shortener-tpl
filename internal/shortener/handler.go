@@ -38,7 +38,7 @@ func (h *handler) Register(router chi.Router) {
 // GetURLByIDHandler -- возвращает длинный URL из локального хранилища по ключу, которым является короткий URL
 func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 	articleID := chi.URLParam(r, "articleID")
-	key := h.baseURL + articleID
+	key := h.baseURL + "/" + articleID
 	log.Println("from handler baseURL: ", h.baseURL)
 	longURL, err := h.store.Get(key)
 	if err != nil {
@@ -68,8 +68,6 @@ func (h *handler) CreateShortURLHandler(w http.ResponseWriter, r *http.Request) 
 	short := Shorting(h.baseURL)
 	h.store.Put(long, short)
 
-
-	//log.Printf("%v: %v\n", short, h.store.db[short])
 	w.Write([]byte(short))
 }
 

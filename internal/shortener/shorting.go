@@ -12,5 +12,5 @@ func Shorting(baseURL string) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 
-	return baseURL+string(b)
+	return baseURL + "/" +string(b)
 }
