@@ -16,6 +16,7 @@ import (
 func Test_handler_GetURLByIDHandler(t *testing.T) {
 	type fields struct {
 		store *MemoryStore
+		baseURL string
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -39,6 +40,10 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
+				baseURL: func() string {
+					cfg := config.GetConfig()
+					return cfg.BaseURL
+				}(),
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
@@ -52,6 +57,10 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 				store: &MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
+				baseURL: func() string {
+					cfg := config.GetConfig()
+					return cfg.BaseURL
+				}(),
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
@@ -63,15 +72,14 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &handler{
 				store: tt.fields.store,
+				baseURL: tt.fields.baseURL,
 			}
 
 			router := chi.NewRouter()
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
-			cfg := config.GetConfig()
 
-			request := fmt.Sprintf("%s%s", cfg.BaseURL, tt.request)
-			log.Println(request)
+			request := fmt.Sprintf("%s%s",h.baseURL , tt.request)
 
 			req := httptest.NewRequest(http.MethodGet, request, nil)
 
@@ -249,3 +257,4 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 		})
 	}
 }
+
