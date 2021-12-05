@@ -26,10 +26,8 @@ func (s *MemoryStore) Get(uuid string) (string, error) {
 	return val, nil
 }
 
-func (s *MemoryStore) Put(URL string) string{
+func (s *MemoryStore) Put(URL string, short string){
 	s.mx.Lock()
 	defer s.mx.Unlock()
-	id := Shorting()
-	s.db[id] = URL
-	return id
+	s.db[short] = URL
 }
