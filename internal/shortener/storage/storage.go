@@ -50,7 +50,7 @@ func (s *URLStore) load() error {
 	var err error
 	for err == nil {
 		var r record
-		if err = d.Decode(&r); err != nil {
+		if err = d.Decode(&r); err == nil {
 			s.Set(r.Key, r.URL)
 		}
 	}
@@ -63,8 +63,8 @@ func (s *URLStore) load() error {
 // Get -- достает из хранилища
 func (s *URLStore) Get(key string) (string, error) {
 	s.mu.RLock()
-	defer s.mu.Unlock()
-
+	defer s.mu.RUnlock()
+	log.Println(s.urls)
 	url, ok := s.urls[key]
 	if !ok {
 		return "", errors.New("short URL not found ")

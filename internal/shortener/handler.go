@@ -37,6 +37,7 @@ func (h *handler) Register(router chi.Router) {
 func (h *handler) GetURLByIDHandler(w http.ResponseWriter, r *http.Request) {
 	key := chi.URLParam(r, "articleID")
 	url, err := h.store.Get(key)
+	log.Println(url)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
