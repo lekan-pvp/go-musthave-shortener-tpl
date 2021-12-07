@@ -17,7 +17,8 @@ type URLStore struct {
 }
 
 type record struct {
-	Key, URL string
+	Key string `json:"url"`
+	URL string `json:"result"`
 }
 
 // NewStore -- фабрика хранилища
