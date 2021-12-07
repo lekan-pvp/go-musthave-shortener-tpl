@@ -1,4 +1,4 @@
-package shortener
+package gen_key
 
 import "math/rand"
 
@@ -6,11 +6,11 @@ const (
 	letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
 
-func Shorting(baseURL string) string {
+func GenKey() string {
 	b := make([]byte, 5)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 
-	return baseURL + "/" +string(b)
+	return string(b)
 }

@@ -5,7 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/storage/storage"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 
 func Test_handler_GetURLByIDHandler(t *testing.T) {
 	type fields struct {
-		store *MemoryStore
+		store   *storage.MemoryStore
 		baseURL string
 	}
 	type args struct {
@@ -24,20 +25,20 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 	}
 	type want struct {
 		contentType string
-		statusCode int
+		statusCode  int
 	}
 	tests := []struct {
-		name   string
+		name    string
 		request string
-		fields fields
-		args   args
-		want want
+		fields  fields
+		args    args
+		want    want
 	}{
 		{
-			name: "success test",
+			name:    "success test",
 			request: "XVlBz",
 			fields: fields{
-				store: &MemoryStore{
+				store: &storage.MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
 				baseURL: func() string {
@@ -47,14 +48,14 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
-				statusCode: 307,
+				statusCode:  307,
 			},
 		},
 		{
-			name: "not found",
+			name:    "not found",
 			request: "1",
 			fields: fields{
-				store: &MemoryStore{
+				store: &storage.MemoryStore{
 					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
 				},
 				baseURL: func() string {
@@ -64,22 +65,21 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
-				statusCode: 400,
+				statusCode:  400,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &handler{
-				store: tt.fields.store,
+				store:   tt.fields.store,
 				baseURL: tt.fields.baseURL,
 			}
 
 			router := chi.NewRouter()
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
-
-			request := fmt.Sprintf("%s/%s",h.baseURL , tt.request)
+			request := fmt.Sprintf("%s/%s", h.baseURL, tt.request)
 
 			req := httptest.NewRequest(http.MethodGet, request, nil)
 
@@ -100,7 +100,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 
 func Test_handler_CreateShortURLHandler(t *testing.T) {
 	type fields struct {
-		store *MemoryStore
+		store *storage.MemoryStore
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -108,37 +108,36 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 	}
 	type want struct {
 		contentType string
-		statusCode int
-		body string
+		statusCode  int
+		body        string
 	}
 	tests := []struct {
-		name   string
+		name    string
 		request string
-		fields fields
-		args   args
-		want want
+		fields  fields
+		args    args
+		want    want
 	}{
 		{
-			name: "success test",
+			name:    "success test",
 			request: "/",
 			fields: fields{
-				store: &MemoryStore{
-					db: map[string]string{"":""},
+				store: &storage.MemoryStore{
+					db: map[string]string{"": ""},
 				},
 			},
 			want: want{
 				contentType: "text/plain",
-				statusCode: 201,
+				statusCode:  201,
 			},
 		},
 		{
-			name: "wrong endpoint",
+			name:    "wrong endpoint",
 			request: "/wrong",
 			want: want{
 				contentType: "text/plain; charset=utf-8",
-				statusCode: 404,
+				statusCode:  404,
 			},
-
 		},
 	}
 	for _, tt := range tests {
@@ -168,7 +167,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 
 func Test_handler_APIShortenHandler(t *testing.T) {
 	type fields struct {
-		store  *MemoryStore
+		store  *storage.MemoryStore
 		url    BodyRequest
 		result BodyResponse
 	}
@@ -178,21 +177,21 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 	}
 	type want struct {
 		contentType string
-		statusCode int
+		statusCode  int
 	}
 	tests := []struct {
-		name   string
-		endppoint string
-		fields fields
-		args   args
-		want want
+		name     string
+		endpoint string
+		fields   fields
+		args     args
+		want     want
 	}{
 		{
-			name: "success test",
-			endppoint: "/api/shorten",
+			name:     "success test",
+			endpoint: "/api/shorten",
 			fields: fields{
-				store: &MemoryStore{
-					db: map[string]string{"":""},
+				store: &storage.MemoryStore{
+					db: map[string]string{"": ""},
 				},
 				url: BodyRequest{
 					GoalURL: "http://google.com",
@@ -203,15 +202,15 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 			},
 			want: want{
 				contentType: "application/json; charset=UTF-8",
-				statusCode: 201,
+				statusCode:  201,
 			},
 		},
 		{
-			name: "wrong endpoint",
-			endppoint: "/wrong",
+			name:     "wrong endpoint",
+			endpoint: "/wrong",
 			fields: fields{
-				store: &MemoryStore{
-					db: map[string]string{"":""},
+				store: &storage.MemoryStore{
+					db: map[string]string{"": ""},
 				},
 				url: BodyRequest{
 					GoalURL: "http://google.com",
@@ -222,7 +221,7 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
-				statusCode: 404,
+				statusCode:  404,
 			},
 		},
 	}
@@ -243,7 +242,7 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 				return
 			}
 
-			req := httptest.NewRequest(http.MethodPost, tt.endppoint, bytes.NewBuffer([]byte(txBz)))
+			req := httptest.NewRequest(http.MethodPost, tt.endpoint, bytes.NewBuffer([]byte(txBz)))
 			req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 
 			rr := httptest.NewRecorder()
@@ -257,4 +256,3 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 		})
 	}
 }
-

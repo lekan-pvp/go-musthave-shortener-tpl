@@ -1,10 +1,10 @@
 package shortener
 
-
 type BodyRequest struct {
-	GoalURL string `json:"url"`
+	LongURL string `json:"long-url"`
 }
 
 type BodyResponse struct {
-	ResultURL string `json:"result"`
+	ShortURL string `json:"short-url"`
 }
+

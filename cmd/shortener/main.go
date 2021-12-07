@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/config"
 	"log"
 	"net/http"
 )
@@ -25,6 +25,3 @@ func main() {
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddress, router))
 }
-
-
-
