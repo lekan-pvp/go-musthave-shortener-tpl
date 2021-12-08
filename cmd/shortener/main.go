@@ -1,29 +1,24 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"io"
+	"github.com/go-chi/chi/v5"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener"
 	"log"
 	"net/http"
 )
 
-func BodyHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	w.Write([]byte(b))
-}
-
-func GetHandler(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-
-}
-
 func main() {
-	router := httprouter.New()
-	router.POST("/", BodyHandler)
-	router.GET("/:id", GetHandler)
+	log.Println("creating router...")
+	router := chi.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Println("register shorner handler...")
+	handler := shortener.NewHandler()
+	handler.Register(router)
+
+	log.Println("start application")
+	log.Println("server is listening port 127.0.0.1:8080")
+	log.Fatal(http.ListenAndServe("localhost:8080", router))
 }
+
+
+
