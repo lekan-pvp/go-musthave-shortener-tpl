@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-chi/chi/v5"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/config"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/storage/storage"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/storage"
 	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
@@ -16,8 +15,10 @@ import (
 
 func Test_handler_GetURLByIDHandler(t *testing.T) {
 	type fields struct {
-		store   *storage.MemoryStore
+		store   *storage.URLStore
 		baseURL string
+		url BodyRequest
+		result BodyResponse
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -38,13 +39,14 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			name:    "success test",
 			request: "XVlBz",
 			fields: fields{
-				store: &storage.MemoryStore{
-					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
+				store: storage.NewStore("testGet.json"),
+				baseURL: "http://localhost:8080",
+				url: BodyRequest{
+					LongURL: "http://google.com",
 				},
-				baseURL: func() string {
-					cfg := config.GetConfig()
-					return cfg.BaseURL
-				}(),
+				result: BodyResponse{
+					ShortURL: "gbaiC",
+				},
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
@@ -55,13 +57,14 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			name:    "not found",
 			request: "1",
 			fields: fields{
-				store: &storage.MemoryStore{
-					db: map[string]string{"http://localhost:8080/XVlBz": "http://google.com"},
+				store: storage.NewStore("testGet.json"),
+				baseURL: "http://localhost:8080",
+				url: BodyRequest{
+					LongURL: "http://google.com",
 				},
-				baseURL: func() string {
-					cfg := config.GetConfig()
-					return cfg.BaseURL
-				}(),
+				result: BodyResponse{
+					ShortURL: "wrong",
+				},
 			},
 			want: want{
 				contentType: "text/plain; charset=utf-8",
@@ -77,9 +80,14 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 			}
 
 			router := chi.NewRouter()
+
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
-			request := fmt.Sprintf("%s/%s", h.baseURL, tt.request)
+			short_url := tt.fields.result.ShortURL
+
+			request := fmt.Sprintf("%s/%s", h.baseURL, short_url)
+
+			log.Println(request)
 
 			req := httptest.NewRequest(http.MethodGet, request, nil)
 
@@ -100,7 +108,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 
 func Test_handler_CreateShortURLHandler(t *testing.T) {
 	type fields struct {
-		store *storage.MemoryStore
+		store *storage.URLStore
 	}
 	type args struct {
 		w http.ResponseWriter
@@ -122,9 +130,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			name:    "success test",
 			request: "/",
 			fields: fields{
-				store: &storage.MemoryStore{
-					db: map[string]string{"": ""},
-				},
+				store: storage.NewStore("test.json"),
 			},
 			want: want{
 				contentType: "text/plain",
@@ -147,7 +153,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			}
 
 			router := chi.NewRouter()
-			router.Post("/", h.CreateShortURLHandler)
+			router.Post("/", h.AddShortURLHandler)
 			req := httptest.NewRequest(http.MethodPost, tt.request, nil)
 
 			rr := httptest.NewRecorder()
@@ -167,7 +173,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 
 func Test_handler_APIShortenHandler(t *testing.T) {
 	type fields struct {
-		store  *storage.MemoryStore
+		store  *storage.URLStore
 		url    BodyRequest
 		result BodyResponse
 	}
@@ -190,14 +196,12 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 			name:     "success test",
 			endpoint: "/api/shorten",
 			fields: fields{
-				store: &storage.MemoryStore{
-					db: map[string]string{"": ""},
-				},
+				store: storage.NewStore("test.json"),
 				url: BodyRequest{
-					GoalURL: "http://google.com",
+					LongURL: "http://google.com",
 				},
 				result: BodyResponse{
-					ResultURL: "http://localhost:8080/gbaiC",
+					ShortURL: "gbaiC",
 				},
 			},
 			want: want{
@@ -209,14 +213,12 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 			name:     "wrong endpoint",
 			endpoint: "/wrong",
 			fields: fields{
-				store: &storage.MemoryStore{
-					db: map[string]string{"": ""},
-				},
+				store: storage.NewStore("test.json"),
 				url: BodyRequest{
-					GoalURL: "http://google.com",
+					LongURL: "http://google.com",
 				},
 				result: BodyResponse{
-					ResultURL: "http://localhost:8080/gbaiC",
+					ShortURL: "http://localhost:8080/gbaiC",
 				},
 			},
 			want: want{
@@ -229,8 +231,8 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			h := &handler{
 				store:  tt.fields.store,
-				url:    tt.fields.url,
-				result: tt.fields.result,
+				long:    tt.fields.url,
+				short: tt.fields.result,
 			}
 
 			router := chi.NewRouter()

@@ -32,7 +32,3 @@ func GetConfig() *Config {
 
 	return instance
 }
-
-func initConfigCobra() {
-
-}
