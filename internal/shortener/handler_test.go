@@ -106,7 +106,7 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 	}
 }
 
-func Test_handler_CreateShortURLHandler(t *testing.T) {
+func Test_handler_AddShortURLHandler(t *testing.T) {
 	type fields struct {
 		store *storage.URLStore
 	}
