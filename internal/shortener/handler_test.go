@@ -83,9 +83,9 @@ func Test_handler_GetURLByIDHandler(t *testing.T) {
 
 			router.Get("/{articleID}", h.GetURLByIDHandler)
 
-			short_url := tt.fields.result.ShortURL
+			shorturl := tt.fields.result.ShortURL
 
-			request := fmt.Sprintf("%s/%s", h.baseURL, short_url)
+			request := fmt.Sprintf("%s/%s", h.baseURL, shorturl)
 
 			log.Println(request)
 
@@ -160,7 +160,7 @@ func Test_handler_CreateShortURLHandler(t *testing.T) {
 			router.ServeHTTP(rr, req)
 
 			result := rr.Result()
-
+			defer result.Body.Close()
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
 
 			assert.Equal(t, tt.want.statusCode, result.StatusCode)
@@ -251,6 +251,7 @@ func Test_handler_APIShortenHandler(t *testing.T) {
 			router.ServeHTTP(rr, req)
 
 			result := rr.Result()
+			defer result.Body.Close()
 
 			assert.Equal(t, tt.want.contentType, result.Header.Get("Content-Type"))
 			assert.Equal(t, tt.want.statusCode, result.StatusCode)
