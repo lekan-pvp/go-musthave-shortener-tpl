@@ -1,6 +1,7 @@
 package config
 
 import (
+	"flag"
 	"github.com/caarlos0/env/v6"
 	"log"
 )
@@ -18,7 +19,20 @@ func GetConfig() *Config {
 	if err := env.Parse(instance); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("%+v", instance)
+
+	serverAddressPtr := flag.String("a", instance.ServerAddress, "адрес запуска HTTP-сервера")
+	baseURLPtr := flag.String("b", instance.BaseURL, "базовый адрес результирующего сокращённого URL")
+	fileStoragePathPtr := flag.String("f", instance.FileStoragePath, "путь до файла с сокращёнными URL")
+
+	flag.Parse()
+
+	instance.ServerAddress = *serverAddressPtr
+	instance.BaseURL = *baseURLPtr
+	instance.FileStoragePath = *fileStoragePathPtr
 
 	return instance
+}
+
+func initConfigCobra() {
+
 }

@@ -19,7 +19,7 @@ type handler struct {
 
 func NewHandler(cfg *config.Config) *handler {
 	store := storage.NewStore(cfg.FileStoragePath)
-	log.Println("NewHandler():", cfg.BaseURL)
+
 	return &handler{
 		store:   store,
 		baseURL: cfg.BaseURL,
