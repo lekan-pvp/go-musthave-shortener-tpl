@@ -3,7 +3,7 @@ package storage
 import (
 	"encoding/json"
 	"errors"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/gen_key"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/genkey"
 	"io"
 	"log"
 	"os"
@@ -86,7 +86,7 @@ func (s *URLStore) Set(key, url string) bool {
 // Put -- генерирует короткий URL, записывает в хранилище и в файл
 func (s *URLStore) Put(url string) string{
 	for {
-		key := gen_key.GenKey()
+		key := genkey.GenKey()
 		if ok := s.Set(key, url); ok {
 			if err := s.save(key, url); err != nil {
 				log.Println("error saving to URLStore:", err)

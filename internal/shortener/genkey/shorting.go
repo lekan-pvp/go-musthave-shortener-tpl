@@ -1,4 +1,4 @@
-package gen_key
+package genkey
 
 import "math/rand"
 
