@@ -1,19 +1,30 @@
 package main
 
 import (
+	"github.com/go-chi/chi"
 	"github.com/go-musthave-shortener-tpl/internal/config"
+	"github.com/go-musthave-shortener-tpl/internal/controllers"
+	"github.com/go-musthave-shortener-tpl/internal/repository"
+	"github.com/go-musthave-shortener-tpl/internal/services"
 	"log"
 	"net/http"
 )
 
 func main() {
 
-	var cfg = config.New()
+	cfg := config.New()
+
+	urlRepo := repository.New(cfg.FileStoragePath)
+	urlService := &services.URLsService{urlRepo}
+	urlController := controllers.URLsController{urlService, cfg}
+
+	router := chi.NewRouter()
+
+	router.Post("/", urlController.AddURL)
+	router.Get("/{articleID}", urlController.GetURLByID)
+	router.Post("/api/shorten", urlController.APIShorten)
 
 	log.Println("creating router...")
-
-	router := ChiRouter().InitRouter()
-
 	log.Println("start application")
 	log.Println("server is listening port", cfg.ServerAddress)
 
