@@ -1,24 +1,18 @@
 package main
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl/internal/shortener/config"
+	"github.com/go-musthave-shortener-tpl/internal/config"
 	"log"
 	"net/http"
 )
 
 func main() {
+
+	var cfg = config.New()
+
 	log.Println("creating router...")
 
-	router := chi.NewRouter()
-
-	log.Println("register shorner handler...")
-
-	cfg := config.GetConfig()
-
-	handler := shortener.NewHandler(cfg)
-	handler.Register(router)
+	router := ChiRouter().InitRouter()
 
 	log.Println("start application")
 	log.Println("server is listening port", cfg.ServerAddress)
