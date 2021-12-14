@@ -13,7 +13,7 @@ func (service *URLsService) CreateURL(url string) (string, error) {
 	return result, err
 }
 
-func (service *URLsService) GetURLsDetail(key string) (string, error) {
+func (service *URLsService) GetURLs(key string) (string, error) {
 	result, err := service.URLsDetail(key)
 	return result, err
 }

@@ -19,16 +19,16 @@ func TestURLsController_AddURL(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if _, body := test_helper.TestRequest(t, ts, "POST", "/", nil); body != "http://localhost:8080/whTHc" {
-		t.Fatal(body)
+	if _, body := test_helper.TestRequest(t, ts, "POST", "/", nil); string(body) != "http://localhost:8080/whTHc" {
+		t.Fatalf("want %s, got %s", "http://localhost:8080/whTHc", string(body))
 	}
 
-	if res, body := test_helper.TestRequest(t, ts, "POST", "/", nil); res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
-		t.Fatal(body)
+	if res, _ := test_helper.TestRequest(t, ts, "POST", "/", nil); res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
+		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	if res, body := test_helper.TestRequest(t, ts, "POST", "/", nil); res.StatusCode != 201 {
-		t.Fatal(body)
+	if res, _ := test_helper.TestRequest(t, ts, "POST", "/", nil); res.StatusCode != 201 {
+		t.Fatalf("want %d, got %d", 201, res.StatusCode)
 	}
 }
 

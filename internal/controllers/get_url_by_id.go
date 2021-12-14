@@ -18,7 +18,7 @@ func (controller *URLsController) GetURLByID(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "url not found", 404)
 		return
 	}
-	url, err := controller.GetURLsDetail(key)
+	url, err := controller.GetURLs(key)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
