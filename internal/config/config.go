@@ -15,6 +15,7 @@ type Config struct {
 var instance *Config
 
 func New() *Config {
+	log.Println("init config...")
 	instance = &Config{}
 	if err := env.Parse(instance); err != nil {
 		log.Fatal(err)
