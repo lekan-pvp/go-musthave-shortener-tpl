@@ -30,5 +30,9 @@ func TestURLsController_AddURL(t *testing.T) {
 	if res, _ := test_helper.TestRequest(t, ts, "POST", "/", nil); res.StatusCode != 201 {
 		t.Fatalf("want %d, got %d", 201, res.StatusCode)
 	}
+
+	if res, _ := test_helper.TestRequest(t, ts, "POST", "/somewrong", nil); res.StatusCode != 404 {
+		t.Fatalf("want %d, got %d", 404, res.StatusCode)
+	}
 }
 
