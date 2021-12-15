@@ -1,6 +1,6 @@
 POST http://localhost:8080/
 Content-Type: text/plain
-Accept-Encoding: gzip
+Content-Encoding: gzip
 
 http://google.com
 

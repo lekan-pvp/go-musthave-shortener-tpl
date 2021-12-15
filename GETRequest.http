@@ -1,5 +1,5 @@
 GET http://localhost:8080/XVlBz
 Content-Type: text/plain
-Accept-Encoding: gzip
+Content-Encoding: gzip
 
 ###
