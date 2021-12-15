@@ -24,7 +24,7 @@ func GzipHandle(next http.Handler) http.Handler {
 			return
 		}
 
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+		if !strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -38,7 +38,7 @@ func GzipHandle(next http.Handler) http.Handler {
 
 		//gz.Reset(w)
 
-		w.Header().Set("Content-Encoding", "gzip")
+		w.Header().Set("Accept-Encoding", "gzip")
 		next.ServeHTTP(gzipWriter{ResponseWriter: w, Writer: gz}, r)
 	})
 }
