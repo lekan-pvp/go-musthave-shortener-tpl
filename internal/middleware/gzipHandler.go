@@ -45,12 +45,12 @@ func GzipHandle(next http.Handler) http.Handler {
 
 
 var contentType  = []string{
-	"application/javascript",
+	//"application/javascript",
 	"application/json",
-	"text/css",
-	"text/html",
+	//"text/css",
+	//"text/html",
 	"text/plain",
-	"text/xml",
+	//"text/xml",
 }
 
 func find(what string, where []string) bool {

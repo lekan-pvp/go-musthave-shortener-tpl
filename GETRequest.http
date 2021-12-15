@@ -1,4 +1,4 @@
-GET http://localhost:8080/XVlBz
+GET http://localhost:8080/gmota
 Content-Type: text/plain
 Content-Encoding: gzip
 
