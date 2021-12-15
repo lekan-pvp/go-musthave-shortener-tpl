@@ -20,6 +20,8 @@ func Run() {
 
 	router := chi.NewRouter()
 
+	router.Use(middleware.Compress(5))
+
 	router.With(middleware.Compress(5)).Post("/", urlController.AddURL)
 	router.With(middleware.Compress(5)).Get("/{articleID}", urlController.GetURLByID)
 	router.With(middleware.Compress(5)).Post("/api/shorten", urlController.APIShorten)
