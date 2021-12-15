@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-musthave-shortener-tpl/internal/config"
 	"github.com/go-musthave-shortener-tpl/internal/controllers"
 	"github.com/go-musthave-shortener-tpl/internal/repository"
@@ -19,9 +20,9 @@ func Run() {
 
 	router := chi.NewRouter()
 
-	router.Post("/", urlController.AddURL)
-	router.Get("/{articleID}", urlController.GetURLByID)
-	router.Post("/api/shorten", urlController.APIShorten)
+	router.With(middleware.Compress(5)).Post("/", urlController.AddURL)
+	router.With(middleware.Compress(5)).Get("/{articleID}", urlController.GetURLByID)
+	router.With(middleware.Compress(5)).Post("/api/shorten", urlController.APIShorten)
 
 	log.Println("creating router...")
 	log.Println("start application")
