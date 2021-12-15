@@ -22,9 +22,9 @@ func Run() {
 
 	router.Use(middleware.Compress(5))
 
-	router.With(middleware.Compress(5)).Post("/", urlController.AddURL)
-	router.With(middleware.Compress(5)).Get("/{articleID}", urlController.GetURLByID)
-	router.With(middleware.Compress(5)).Post("/api/shorten", urlController.APIShorten)
+	router.Post("/", urlController.AddURL)
+	router.Get("/{articleID}", urlController.GetURLByID)
+	router.Post("/api/shorten", urlController.APIShorten)
 
 	log.Println("creating router...")
 	log.Println("start application")
