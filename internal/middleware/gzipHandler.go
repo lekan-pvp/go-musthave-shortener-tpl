@@ -18,11 +18,11 @@ func (w gzipWriter) Write(b []byte) (int, error) {
 
 func GzipHandle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//ct := r.Header.Get("Content-Type")
-		//if !find(ct, contentType) {
-		//	next.ServeHTTP(w, r)
-		//	return
-		//}
+		ct := r.Header.Get("Content-Type")
+		if !find(ct, contentType) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
 			next.ServeHTTP(w, r)
@@ -44,20 +44,20 @@ func GzipHandle(next http.Handler) http.Handler {
 }
 
 
-//var contentType  = []string{
-//	"application/javascript",
-//	"application/json",
-//	"text/css",
-//	"text/html",
-//	"text/plain",
-//	"text/xml",
-//}
+var contentType  = []string{
+	"application/javascript",
+	"application/json",
+	"text/css",
+	"text/html",
+	"text/plain",
+	"text/xml",
+}
 
-//func find(what string, where []string) bool {
-//	for _, v := range where {
-//		if v == what {
-//			return true
-//		}
-//	}
-//	return false
-//}
+func find(what string, where []string) bool {
+	for _, v := range where {
+		if strings.Contains(v, what) {
+			return true
+		}
+	}
+	return false
+}

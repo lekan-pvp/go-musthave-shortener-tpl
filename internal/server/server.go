@@ -20,9 +20,10 @@ func Run() {
 
 	router := chi.NewRouter()
 
-	router.With(middleware.GzipHandle).Post("/", urlController.AddURL)
+
+	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/", urlController.AddURL)
 	router.With(middleware.GzipHandle).Get("/{articleID}", urlController.GetURLByID)
-	router.With(middleware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
+	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
 
 	log.Println("creating router...")
 	log.Println("start application")
