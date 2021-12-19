@@ -57,7 +57,7 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 func (controller *URLsController) resultList(out []models.URLs) []URLS {
 	var result []URLS
 	for _, v := range out {
-		result = append(result, URLS{ShortURL: controller.Cfg.BaseURL + "/" + v.ShortURL, OriginalURL: v.OriginalURL})
+		result = append(result, URLS{ShortURL: v.ShortURL, OriginalURL: v.OriginalURL})
 	}
 	return result
 }
