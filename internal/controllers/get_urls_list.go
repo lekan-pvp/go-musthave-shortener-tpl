@@ -32,7 +32,7 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	values := strings.Split(cookie.Value, ":")
 	uuid := values[0]
 
-	out = controller.GetURLsListByUUID(uuid)
+	out = controller.GetURLsListByUUID(uuid, controller.Cfg.BaseURL)
 	resultSlice = controller.resultList(out)
 
 	log.Println(out)

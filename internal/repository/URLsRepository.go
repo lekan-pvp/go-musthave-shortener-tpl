@@ -15,7 +15,7 @@ import (
 type URLsRepository struct {
 	URLRepository interfaces.IURLRepository
 	mu sync.RWMutex
-	users map[string][]models.URLs
+	users []models.URLs
 	urls map[string]string
 	file *os.File
 }
@@ -24,7 +24,6 @@ type URLsRepository struct {
 
 func New(filename string) *URLsRepository {
 	s := &URLsRepository {
-		users: make(map[string][]models.URLs),
 		urls: make(map[string]string),
 	}
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -51,10 +50,20 @@ func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 	}
 }
 
-func (repo *URLsRepository) GetURLsList(uuid string) []models.URLs {
+func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
+	var user []models.URLs
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
-	return repo.users[uuid]
+
+	for _, v := range repo.users {
+		if v.UUID == uuid {
+			user = append(user, models.URLs{
+				ShortURL: baseURL + "/" + v.ShortURL,
+				OriginalURL: v.OriginalURL,
+			})
+		}
+	}
+	return user
 }
 
 func (repo *URLsRepository) URLsDetail(short string) (string, error) {
@@ -94,7 +103,7 @@ func (repo *URLsRepository) load() error  {
 func (repo *URLsRepository) set(uuid, short, orig string) bool {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
-	repo.users[uuid] = append(repo.users[uuid], models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
+	repo.users = append(repo.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
 	repo.urls[short] = orig
 	return true
 }
