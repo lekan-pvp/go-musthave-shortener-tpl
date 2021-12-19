@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type short struct {
@@ -15,9 +17,26 @@ type long struct {
 }
 
 
+
 func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Request) {
 	short := short{}
 	long := long{}
+
+	var uuid string
+
+	cookie, err := r.Cookie("uid")
+	if err != nil {
+		cookie = cookie_handler.CreateCookie()
+		http.SetCookie(w, cookie)
+	}
+
+	if cookie_handler.CheckCookie(cookie) {
+		cookie = cookie_handler.CreateCookie()
+		http.SetCookie(w, cookie)
+	}
+
+	values := strings.Split(cookie.Value, ":")
+	uuid = values[0]
 
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -33,12 +52,12 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	key, err := controller.CreateURL(long.Url)
+	shortURL, err := controller.CreateURL(uuid, long.Url)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	short.Key = controller.Cfg.BaseURL + "/" + key
+	short.Key = controller.Cfg.BaseURL + "/" + shortURL
 	result, err := json.Marshal(&short)
 	if err != nil {
 		http.Error(w, err.Error(), 500)

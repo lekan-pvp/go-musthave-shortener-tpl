@@ -1,26 +1,43 @@
 package controllers
 
 import (
+	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func (controller *URLsController) AddURL(w http.ResponseWriter, r *http.Request) {
+	var uuid string
+
+	cookie, err := r.Cookie("uid")
+	if err != nil {
+		cookie = cookie_handler.CreateCookie()
+		http.SetCookie(w, cookie)
+	}
+
+	if cookie_handler.CheckCookie(cookie) {
+		cookie = cookie_handler.CreateCookie()
+		http.SetCookie(w, cookie)
+	}
+
+	values := strings.Split(cookie.Value, ":")
+	uuid = values[0]
+
+
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	url := string(body)
+	orig := string(body)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	key, err := controller.CreateURL(url)
+	short, err := controller.CreateURL(uuid, orig)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	w.Write([]byte(controller.Cfg.BaseURL + "/" + key))
+	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
 }
-
-

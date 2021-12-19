@@ -13,12 +13,12 @@ type URLsController struct {
 }
 
 func (controller *URLsController) GetURLByID(w http.ResponseWriter, r *http.Request) {
-	key := chi.URLParam(r, "articleID")
-	if key == "" {
-		http.Error(w, "url not found", 404)
+	short := chi.URLParam(r, "articleID")
+	if short == "" {
+		http.Error(w, "url is empty", 404)
 		return
 	}
-	url, err := controller.GetURLs(key)
+	url, err := controller.GetURLs(short)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return

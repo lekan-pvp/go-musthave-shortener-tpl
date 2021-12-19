@@ -1,7 +1,8 @@
 package models
 
 type URLs struct {
-	Key string `json:"result"`
-	URL string `json:"url"`
+	UUID string `json:"-"`
+	ShortURL string `json:"short_url"`
+	OriginalURL string `json:"original_url"`
 }
 

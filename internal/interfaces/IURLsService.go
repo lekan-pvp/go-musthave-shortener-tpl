@@ -1,6 +1,9 @@
 package interfaces
 
+import "github.com/go-musthave-shortener-tpl/internal/models"
+
 type IURLsService interface {
-	CreateURL(url string) (string, error)
-	GetURLs(key string) (string, error)
+	CreateURL(uuid string, orig string) (string, error)
+	GetURLs(short string) (string, error)
+	GetURLsListByUUID(uuid, baseURL string) []models.URLs
 }
