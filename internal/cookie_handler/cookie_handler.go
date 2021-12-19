@@ -36,7 +36,6 @@ func CreateCookie() *http.Cookie {
 	cookie := &http.Cookie{
 		Name: "uid",
 		Value: fmt.Sprintf("%d:%x", uid, dst),
-		Path: "/",
 	}
 
 	return cookie
