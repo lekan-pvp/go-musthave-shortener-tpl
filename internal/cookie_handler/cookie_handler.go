@@ -12,9 +12,9 @@ import (
 	"strings"
 )
 
-func CreateCookie() *http.Cookie {
-	key := []byte("secret key")
+var key = []byte("secret key")
 
+func CreateCookie() *http.Cookie {
 	gen, err := generate_random.GenerateRandom(16)
 	if err != nil {
 		log.Fatal(err)
@@ -30,31 +30,32 @@ func CreateCookie() *http.Cookie {
 	uid := binary.BigEndian.Uint32(data[:4])
 
 	h := hmac.New(sha256.New, key)
-	h.Write([]byte(fmt.Sprintf("%x", uid)))
+	h.Write([]byte(fmt.Sprintf("%d", uid)))
 	dst := h.Sum(nil)
 
 	cookie := &http.Cookie{
 		Name: "uid",
 		Value: fmt.Sprintf("%d:%x", uid, dst),
-		Path: "/",
+		Path: "/user",
 	}
 
 	return cookie
 }
 
 func CheckCookie(cookie *http.Cookie) bool {
-	key := []byte("secret key")
-
 	values := strings.Split(cookie.Value, ":")
 	data, err := hex.DecodeString(values[1])
 	if err != nil {
 		log.Fatal(err)
 		return false
 	}
-
+	uuid := binary.BigEndian.Uint32(data[:4])
+	id := values[0]
 	h := hmac.New(sha256.New, key)
 	h.Write(data[:4])
 	sign := h.Sum(nil)
+
+	log.Printf("%s:%d:%x:%x",id, uuid, sign, data[:4])
 
 	if hmac.Equal(sign, data[:4]) {
 		return true

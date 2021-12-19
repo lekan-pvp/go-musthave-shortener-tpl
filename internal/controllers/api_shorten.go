@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -25,12 +26,9 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 	var uuid string
 
 	cookie, err := r.Cookie("uid")
-	if err != nil {
-		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
-	}
-
-	if cookie_handler.CheckCookie(cookie) {
+	log.Printf("%v", cookie)
+	if err != nil || !cookie_handler.CheckCookie(cookie) {
+		log.Println(err)
 		cookie = cookie_handler.CreateCookie()
 		http.SetCookie(w, cookie)
 	}
