@@ -19,7 +19,7 @@ func (service *URLsService) GetURLs(short string) (string, error) {
 	return result, err
 }
 
-func (service *URLsService) GetURLsListByUUID(uuid string, baseURL string) []models.URLs {
-	result := service.GetURLsList(uuid, baseURL)
+func (service *URLsService) GetURLsListByUUID(uuid string) []models.URLs {
+	result := service.GetURLsList(uuid)
 	return result
 }

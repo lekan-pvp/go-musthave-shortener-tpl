@@ -15,14 +15,18 @@ import (
 type URLsRepository struct {
 	URLRepository interfaces.IURLRepository
 	mu sync.RWMutex
-	urls []models.URLs
+	users map[string][]models.URLs
+	urls map[string]string
 	file *os.File
 }
 
 
 
 func New(filename string) *URLsRepository {
-	s := &URLsRepository{}
+	s := &URLsRepository {
+		users: make(map[string][]models.URLs),
+		urls: make(map[string]string),
+	}
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal("error loading in Store:", err)
@@ -47,32 +51,21 @@ func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 	}
 }
 
-func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
-	var user []models.URLs
+func (repo *URLsRepository) GetURLsList(uuid string) []models.URLs {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
-
-	for _, v := range repo.urls {
-		if v.UUID == uuid {
-			user = append(user, models.URLs{
-				ShortURL: baseURL + "/" + v.ShortURL,
-				OriginalURL: v.OriginalURL,
-			})
-		}
-	}
-	return user
+	return repo.users[uuid]
 }
 
 func (repo *URLsRepository) URLsDetail(short string) (string, error) {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	log.Println(repo.urls)
-	for _, v := range repo.urls {
-		if v.ShortURL == short {
-			return v.OriginalURL, nil
-		}
+	url, ok := repo.urls[short]
+	if !ok {
+		return "", errors.New("short URL not found")
 	}
-	return "", errors.New("URL not found")
+	return url, nil
 }
 
 func (repo *URLsRepository) save(uuid string, short, orig string) error {
@@ -98,10 +91,11 @@ func (repo *URLsRepository) load() error  {
 	return err
 }
 
-func (repo *URLsRepository) set(uuid string, short, orig string) bool {
+func (repo *URLsRepository) set(uuid, short, orig string) bool {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
-	repo.urls = append(repo.urls, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
+	repo.users[uuid] = append(repo.users[uuid], models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
+	repo.urls[short] = orig
 	return true
 }
 

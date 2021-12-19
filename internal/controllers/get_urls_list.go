@@ -9,8 +9,13 @@ import (
 	"strings"
 )
 
+type URLS struct {
+	ShortURL string `json:"short_url"`
+	OriginalURL string `json:"original_url"`
+}
 
 var out []models.URLs
+var resultSlice []URLS
 
 func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("uid")
@@ -27,13 +32,12 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	values := strings.Split(cookie.Value, ":")
 	uuid := values[0]
 
-	out = controller.GetURLsListByUUID(uuid, controller.Cfg.BaseURL)
-
-
+	out = controller.GetURLsListByUUID(uuid)
+	resultSlice = controller.resultList(out)
 
 	log.Println(out)
 
-	result, err := json.MarshalIndent(&out, "", " ")
+	result, err := json.MarshalIndent(&resultSlice, "", " ")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -48,4 +52,12 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	}
 
 	w.Write(result)
+}
+
+func (controller *URLsController) resultList(out []models.URLs) []URLS {
+	var result []URLS
+	for _, v := range out {
+		result = append(result, URLS{ShortURL: controller.Cfg.BaseURL + "/" + v.ShortURL, OriginalURL: v.OriginalURL})
+	}
+	return result
 }
