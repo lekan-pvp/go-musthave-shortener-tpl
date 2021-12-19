@@ -104,6 +104,9 @@ func (repo *URLsRepository) set(uuid, short, orig string) bool {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 	repo.users = append(repo.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
+	if _, present := repo.urls[short]; present {
+		return false
+	}
 	repo.urls[short] = orig
 	return true
 }
