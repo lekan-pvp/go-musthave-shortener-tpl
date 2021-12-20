@@ -29,7 +29,6 @@ func CreateCookie() *http.Cookie {
 	}
 
 	uid := binary.BigEndian.Uint32(data[:4])
-	log.Printf("%d\n", uid)
 
 	id:= strconv.Itoa(int(uid))
 
@@ -42,7 +41,6 @@ func CreateCookie() *http.Cookie {
 		Value: fmt.Sprintf("%s:%x", id, dst),
 		Path: "/",
 	}
-	log.Printf("%s, %x", id, dst)
 	return cookie
 }
 

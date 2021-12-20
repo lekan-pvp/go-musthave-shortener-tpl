@@ -33,13 +33,16 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	out = controller.GetURLsListByUUID(uuid, controller.Cfg.BaseURL)
 	resultSlice = controller.resultList(out)
 
-	log.Println(out)
+	log.Println("OUT:", out)
+	log.Println("RESULT:", resultSlice)
 
 	result, err := json.MarshalIndent(&resultSlice, "", " ")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
