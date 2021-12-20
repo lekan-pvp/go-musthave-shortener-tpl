@@ -21,8 +21,6 @@ var out []models.URLs
 var resultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
-	log.Println("IN GetUserURLs:")
-
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -34,10 +32,11 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	uuid := values[0]
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
+	log.Println("OUT=", out)
 	resultSlice = controller.resultList(out)
+	log.Println("resultSlice=", resultSlice)
 
 	if len(resultSlice) == 0 {
-		log.Println("len(resultSlice)=", len(resultSlice))
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return
@@ -45,6 +44,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 
 	result, err := json.MarshalIndent(resultSlice, "", " ")
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
