@@ -24,7 +24,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	log.Println("IN GetUserURLs:")
 
 	cookie, err := r.Cookie("token")
-	if err != nil {
+	if err != nil || cookie_handler.CheckCookie(cookie){
 		cookie = cookie_handler.CreateCookie()
 		http.SetCookie(w, cookie)
 	}
@@ -41,18 +41,16 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	log.Println(resultSlice)
 	result, err := json.MarshalIndent(resultSlice, "", " ")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	log.Println(result)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 
-	fmt.Fprintf(w, "%s\n", result)
+	fmt.Fprintf(w, "%s", result)
 	w.Write(result)
 }
 
