@@ -15,8 +15,8 @@ func Run() {
 	cfg := config.New()
 
 	urlRepo := repository.New(cfg.FileStoragePath)
-	urlService := services.URLsService{urlRepo}
-	urlController := controllers.Controller{&urlService, cfg}
+	urlService := &services.URLsService{urlRepo}
+	urlController := controllers.Controller{urlService, cfg}
 
 	router := chi.NewRouter()
 

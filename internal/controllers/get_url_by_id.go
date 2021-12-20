@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
+	"log"
 	"net/http"
 )
 
 func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
+	log.Println("IN GetURLByID")
 	short := chi.URLParam(r, "articleID")
 	if short == "" {
 		http.Error(w, "url is empty", 404)

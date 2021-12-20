@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"log"
 	"net/http"
@@ -20,11 +21,12 @@ var out []models.URLs
 var resultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
+	log.Println("IN GetUserURLs:")
+
 	cookie, err := r.Cookie("token")
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(204)
-		return
+		cookie = cookie_handler.CreateCookie()
+		http.SetCookie(w, cookie)
 	}
 
 	values := strings.Split(cookie.Value, ":")
@@ -40,22 +42,19 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-
-	result, err := json.Marshal(&resultSlice)
+	log.Println(resultSlice)
+	result, err := json.MarshalIndent(resultSlice, "", " ")
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-
-
+	log.Println(result)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-	fmt.Fprintln(w, result)
-	w.Write(result)
 	w.WriteHeader(200)
 
-
+	fmt.Fprintf(w, "%s\n", result)
+	w.Write(result)
 }
 
 func (controller *Controller) resultList(out []models.URLs) []URLS {
