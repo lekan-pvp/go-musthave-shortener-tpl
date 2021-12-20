@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"log"
@@ -42,7 +41,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	result, err := json.MarshalIndent(resultSlice, "", " ")
+	result, err := json.MarshalIndent(&resultSlice, "", " ")
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), 500)
@@ -52,7 +51,6 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 
-	fmt.Fprintf(w, "%s", result)
 	w.Write(result)
 }
 
