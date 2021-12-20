@@ -29,7 +29,6 @@ func CreateCookie() *http.Cookie {
 	}
 
 	uid := binary.BigEndian.Uint32(data[:4])
-
 	id:= strconv.Itoa(int(uid))
 
 	log.Println("IN CreateCookie:", id, uid)
@@ -49,21 +48,20 @@ func CreateCookie() *http.Cookie {
 
 func CheckCookie(cookie *http.Cookie) bool {
 	values := strings.Split(cookie.Value, ":")
+
 	data, err := hex.DecodeString(values[1])
 	if err != nil {
 		log.Fatal(err)
 		return false
 	}
-	uuid := binary.BigEndian.Uint32(data[:4])
+
 	id := values[0]
 
-	log.Println("IDs IN CheckCookie", id, uuid)
-
 	h := hmac.New(sha256.New, key)
-	h.Write(data[:4])
+	h.Write([]byte(id))
 	sign := h.Sum(nil)
 
-	if hmac.Equal(sign, data[:4]) {
+	if hmac.Equal(sign, []byte(data)) {
 		return true
 	} else {
 		return false
