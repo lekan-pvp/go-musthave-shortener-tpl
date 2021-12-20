@@ -20,7 +20,7 @@ var resultSlice []URLS
 func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
 	if err != nil || cookie_handler.CheckCookie(cookie){
-		log.Fatalf("From GetUserURLs %v", err)
+
 		cookie = cookie_handler.CreateCookie()
 		http.SetCookie(w, cookie)
 	}
@@ -41,15 +41,17 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 			http.Error(w, err.Error(), 500)
 			return
 		} else {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			w.Write(JSON)
 		}
 	}
 
 	if len(resultSlice) == 0 {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		log.Println("len(resultSlice)=", len(resultSlice))
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 	} else {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 		w.WriteHeader(200)
 	}
 }
