@@ -32,6 +32,8 @@ func CreateCookie() *http.Cookie {
 
 	id:= strconv.Itoa(int(uid))
 
+	log.Println("IN CreateCookie:", id, uid)
+
 	h := hmac.New(sha256.New, key)
 	h.Write([]byte(id))
 	dst := h.Sum(nil)
