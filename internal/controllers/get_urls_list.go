@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"log"
 	"net/http"
@@ -19,10 +18,10 @@ var resultSlice []URLS
 
 func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
-	if err != nil || cookie_handler.CheckCookie(cookie){
-
-		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(204)
+		return
 	}
 
 	values := strings.Split(cookie.Value, ":")
