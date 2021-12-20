@@ -1,9 +1,8 @@
 package generate_random
 
-import "math/rand"
+import "crypto/rand"
 
 func GenerateRandom(size int) ([]byte, error) {
-	// генерируем случайную последовательность байт
 	b := make([]byte, size)
 	_, err := rand.Read(b)
 	if err != nil {
