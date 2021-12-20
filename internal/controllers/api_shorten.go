@@ -36,6 +36,8 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
 
+	//uuid = "123456789"
+
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
