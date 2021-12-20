@@ -38,7 +38,7 @@ func CreateCookie() *http.Cookie {
 	dst := h.Sum(nil)
 
 	cookie := &http.Cookie{
-		Name: "uid",
+		Name: "token",
 		Value: fmt.Sprintf("%s:%x", id, dst),
 		Path: "/",
 	}

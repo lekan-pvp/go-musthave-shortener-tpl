@@ -24,15 +24,18 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 	long := long{}
 
 	var uuid string
+	var cookie *http.Cookie
+	var err error
 
-	cookie, err := r.Cookie("uid")
-	log.Printf("%v", cookie)
+	cookie, err = r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie) {
 		log.Println(err)
 		cookie = cookie_handler.CreateCookie()
+
 	}
 
 	http.SetCookie(w, cookie)
+
 
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]

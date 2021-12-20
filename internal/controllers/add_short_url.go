@@ -9,11 +9,12 @@ import (
 
 func (controller *URLsController) AddURL(w http.ResponseWriter, r *http.Request) {
 	var uuid string
+	var cookie *http.Cookie
+	var err error
 
-	cookie, err := r.Cookie("uid")
+	cookie, err = r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		cookie = cookie_handler.CreateCookie()
-
 	}
 
 	http.SetCookie(w, cookie)
