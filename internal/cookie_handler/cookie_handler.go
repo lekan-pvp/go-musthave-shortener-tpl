@@ -39,7 +39,7 @@ func CreateCookie() *http.Cookie {
 
 	cookie := &http.Cookie{
 		Name: "uid",
-		Value: fmt.Sprintf("%s%x", id, dst),
+		Value: fmt.Sprintf("%s:%x", id, dst),
 	}
 	log.Printf("%s, %x", id, dst)
 	return cookie
