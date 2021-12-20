@@ -24,7 +24,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	log.Println("IN GetUserURLs:")
 
 	cookie, err := r.Cookie("token")
-	if err != nil || cookie_handler.CheckCookie(cookie){
+	if err != nil || !cookie_handler.CheckCookie(cookie){
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return
