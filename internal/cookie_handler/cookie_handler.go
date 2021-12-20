@@ -52,8 +52,11 @@ func CheckCookie(cookie *http.Cookie) bool {
 		log.Fatal(err)
 		return false
 	}
-	//uuid := binary.BigEndian.Uint32(data[:4])
-	//id := values[0]
+	uuid := binary.BigEndian.Uint32(data[:4])
+	id := values[0]
+
+	log.Println("IDs IN CheckCookie", id, uuid)
+
 	h := hmac.New(sha256.New, key)
 	h.Write(data[:4])
 	sign := h.Sum(nil)
