@@ -47,7 +47,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
+	log.Printf("%s\n", result)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 
