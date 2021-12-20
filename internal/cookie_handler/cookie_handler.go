@@ -9,6 +9,7 @@ import (
 	"github.com/go-musthave-shortener-tpl/internal/generate_random"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -28,18 +29,22 @@ func CreateCookie() *http.Cookie {
 	}
 
 	uid := binary.BigEndian.Uint32(data[:4])
+	log.Printf("%d\n", uid)
+
+	id:= strconv.Itoa(int(uid))
 
 	h := hmac.New(sha256.New, key)
-	h.Write([]byte(fmt.Sprintf("%d", uid)))
+	h.Write([]byte(id))
 	dst := h.Sum(nil)
 
 	cookie := &http.Cookie{
 		Name: "uid",
-		Value: fmt.Sprintf("%d:%x", uid, dst),
+		Value: fmt.Sprintf("%s%x", id, dst),
 	}
-
+	log.Printf("%s, %x", id, dst)
 	return cookie
 }
+
 
 func CheckCookie(cookie *http.Cookie) bool {
 	values := strings.Split(cookie.Value, ":")
@@ -48,13 +53,11 @@ func CheckCookie(cookie *http.Cookie) bool {
 		log.Fatal(err)
 		return false
 	}
-	uuid := binary.BigEndian.Uint32(data[:4])
-	id := values[0]
+	//uuid := binary.BigEndian.Uint32(data[:4])
+	//id := values[0]
 	h := hmac.New(sha256.New, key)
 	h.Write(data[:4])
 	sign := h.Sum(nil)
-
-	log.Printf("%s:%d:%x:%x",id, uuid, sign, data[:4])
 
 	if hmac.Equal(sign, data[:4]) {
 		return true
