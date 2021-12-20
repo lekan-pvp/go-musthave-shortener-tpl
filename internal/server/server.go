@@ -15,16 +15,17 @@ func Run() {
 	cfg := config.New()
 
 	urlRepo := repository.New(cfg.FileStoragePath)
-	urlService := &services.URLsService{urlRepo}
-	urlController := controllers.URLsController{urlService, cfg}
+	urlService := services.URLsService{urlRepo}
+	urlController := controllers.Controller{&urlService, cfg}
 
 	router := chi.NewRouter()
 
 
+	router.Get("/user/urls", urlController.GetUserURLs)
 	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/", urlController.AddURL)
 	router.With(middleware.GzipHandle).Get("/{articleID}", urlController.GetURLByID)
 	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
-	router.Get("/user/urls", urlController.GetUserURLs)
+
 
 	log.Println("creating router...")
 	log.Println("start application")

@@ -19,7 +19,7 @@ type long struct {
 
 
 
-func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Request) {
+func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {
 	short := short{}
 	long := long{}
 

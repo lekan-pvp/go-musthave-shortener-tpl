@@ -2,17 +2,10 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/go-musthave-shortener-tpl/internal/config"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
 	"net/http"
 )
 
-type URLsController struct {
-	interfaces.IURLsService
-	Cfg *config.Config
-}
-
-func (controller *URLsController) GetURLByID(w http.ResponseWriter, r *http.Request) {
+func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	short := chi.URLParam(r, "articleID")
 	if short == "" {
 		http.Error(w, "url is empty", 404)

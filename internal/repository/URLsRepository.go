@@ -52,7 +52,10 @@ func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 
 func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
 	var user []models.URLs
-
+	repo.mu.RLock()
+	defer repo.mu.RUnlock()
+	
+	log.Println("From GetURLsList: ")
 	for _, v := range repo.users {
 		if v.UUID == uuid {
 			user = append(user, models.URLs{
@@ -67,7 +70,7 @@ func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
 func (repo *URLsRepository) URLsDetail(short string) (string, error) {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
-	log.Println(repo.urls)
+	log.Println("From URLsDetail:")
 	url, ok := repo.urls[short]
 	if !ok {
 		return "", errors.New("short URL not found")

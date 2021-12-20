@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func (controller *URLsController) AddURL(w http.ResponseWriter, r *http.Request) {
+func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 	var cookie *http.Cookie
 	var err error
