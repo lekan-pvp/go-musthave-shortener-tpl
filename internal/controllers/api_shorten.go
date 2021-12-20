@@ -30,13 +30,13 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 	if err != nil || !cookie_handler.CheckCookie(cookie) {
 		log.Println(err)
 		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
 	}
+
+	http.SetCookie(w, cookie)
 
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
 
-	//uuid = "123456789"
 
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()

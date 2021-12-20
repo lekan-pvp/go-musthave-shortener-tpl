@@ -13,9 +13,10 @@ func (controller *URLsController) AddURL(w http.ResponseWriter, r *http.Request)
 	cookie, err := r.Cookie("uid")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
+
 	}
 
+	http.SetCookie(w, cookie)
 
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]

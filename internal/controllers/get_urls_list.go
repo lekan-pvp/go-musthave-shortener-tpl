@@ -19,20 +19,16 @@ var resultSlice []URLS
 
 func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("uid")
-	if err != nil {
-		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
-	}
-
-	if cookie_handler.CheckCookie(cookie) {
-		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
+	if err != nil || cookie_handler.CheckCookie(cookie){
+		log.Fatalf("From GetUserURLs %e", err)
+		return
 	}
 
 	values := strings.Split(cookie.Value, ":")
 	uuid := values[0]
 
-	//uuid := "123456789"
+	log.Printf("%s", uuid)
+
 	out = controller.GetURLsListByUUID(uuid, controller.Cfg.BaseURL)
 	resultSlice = controller.resultList(out)
 
