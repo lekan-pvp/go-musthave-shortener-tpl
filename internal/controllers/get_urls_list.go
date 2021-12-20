@@ -33,10 +33,7 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	out = controller.GetURLsListByUUID(uuid, controller.Cfg.BaseURL)
 	resultSlice = controller.resultList(out)
 
-	log.Println("OUT:",len(out), out)
-	log.Println("RESULT:", len(resultSlice), resultSlice)
 
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 	for _, result := range resultSlice {
 		JSON, err := json.MarshalIndent(result, "", " ")
@@ -49,8 +46,10 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 	}
 
 	if len(resultSlice) == 0 {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(204)
 	} else {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 	}
 }
