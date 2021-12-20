@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"log"
 	"net/http"
@@ -45,7 +46,11 @@ func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	fmt.Println(string(result))
+
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 	w.Write(result)
 	w.WriteHeader(200)
 
