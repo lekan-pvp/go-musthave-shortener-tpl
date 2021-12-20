@@ -27,6 +27,11 @@ func (controller *URLsController) APIShorten(w http.ResponseWriter, r *http.Requ
 	var cookie *http.Cookie
 	var err error
 
+	cookies := r.Cookies()
+	for c := range cookies {
+		log.Println(c)
+	}
+
 	cookie, err = r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie) {
 		log.Println(err)
