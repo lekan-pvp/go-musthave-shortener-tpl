@@ -18,7 +18,7 @@ var out []models.URLs
 var resultSlice []URLS
 
 func (controller *URLsController) GetUserURLs(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("uid")
+	cookie, err := r.Cookie("token")
 	if err != nil || cookie_handler.CheckCookie(cookie){
 		log.Fatalf("From GetUserURLs %e", err)
 		return
