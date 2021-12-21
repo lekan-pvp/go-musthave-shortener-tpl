@@ -17,10 +17,10 @@ type URLS struct {
 }
 
 var out []models.URLs
-type ResultSlice []URLS
+type ResultSlice []*URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
-	var resultSlice ResultSlice
+	var resultSlice *ResultSlice
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -32,11 +32,11 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	uuid := values[0]
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
-	resultSlice = controller.resultList(out)
+	resultSlice = resultList(out)
 
 	log.Println(resultSlice)
 
-	if len(resultSlice) == 0 {
+	if resultSlice == nil {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return
@@ -56,26 +56,26 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	w.Write(marshaled)
 }
 
-func (controller *Controller) resultList(out []models.URLs) ResultSlice {
-	var result []URLS
+func resultList(out []models.URLs) *ResultSlice {
+	var result ResultSlice
 	for _, v := range out {
-		result = append(result, URLS{ShortURL: v.ShortURL, OriginalURL: v.OriginalURL})
+		result = append(result, &URLS{ShortURL: v.ShortURL, OriginalURL: v.OriginalURL})
 	}
-	return result
+	return &result
 }
 
-func (u *URLS) MarshalJSON() ([]byte, error) {
-	arr := []interface{}{u.ShortURL, u.OriginalURL}
-	return json.Marshal(arr)
-}
-
-func (u *URLS) UnmarshalJSON(bs []byte) error {
-	arr := []interface{}{}
-	err := json.Unmarshal(bs, &arr)
-	if err != nil {
-		return err
-	}
-	u.ShortURL = arr[0].(string)
-	u.OriginalURL = arr[1].(string)
-	return nil
-}
+//func (u *URLS) MarshalJSON() ([]byte, error) {
+//	arr := []interface{}{u.ShortURL, u.OriginalURL}
+//	return json.Marshal(arr)
+//}
+//
+//func (u *URLS) UnmarshalJSON(bs []byte) error {
+//	arr := []interface{}{}
+//	err := json.Unmarshal(bs, &arr)
+//	if err != nil {
+//		return err
+//	}
+//	u.ShortURL = arr[0].(string)
+//	u.OriginalURL = arr[1].(string)
+//	return nil
+//}
