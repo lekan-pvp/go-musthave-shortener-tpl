@@ -44,6 +44,8 @@ func CheckCookie(cookie *http.Cookie) bool {
 
 	id := values[0]
 
+	log.Println("IN CheckCookie:", id)
+
 	h := hmac.New(sha256.New, key)
 	h.Write([]byte(id))
 	sign := h.Sum(nil)
