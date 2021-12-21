@@ -62,6 +62,7 @@ func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
 	for _, v := range repo.users {
 		if v.UUID == uuid {
 			user = append(user, models.URLs{
+				UUID: v.UUID,
 				ShortURL: baseURL + "/" + v.ShortURL,
 				OriginalURL: v.OriginalURL,
 			})

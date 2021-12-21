@@ -29,7 +29,6 @@ func Run() {
 		r.Use(mware.GzipHandle)
 		r.Get("/", urlController.GetURLByID)
 	})
-	//router.With(mware.GzipHandle).Get("/{articleID}", urlController.GetURLByID)
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
 
 

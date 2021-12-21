@@ -34,6 +34,8 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	uuid := values[0]
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
+	log.Println(out)
+
 	resultSlice.Add(out)
 
 	if resultSlice == nil {
