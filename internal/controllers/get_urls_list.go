@@ -68,3 +68,14 @@ func (u *URLS) MarshalJSON() ([]byte, error) {
 	arr := []interface{}{u.ShortURL, u.OriginalURL}
 	return json.Marshal(arr)
 }
+
+func (u *URLS) UnmarshalJSON(bs []byte) error {
+	arr := []interface{}{}
+	err := json.Unmarshal(bs, &arr)
+	if err != nil {
+		return err
+	}
+	u.ShortURL = arr[0].(string)
+	u.OriginalURL = arr[1].(string)
+	return nil
+}
