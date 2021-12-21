@@ -3,7 +3,6 @@ package controllers
 import (
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -13,17 +12,8 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	var cookie *http.Cookie
 	var err error
 
-	cookies := r.Cookies()
-	for c := range cookies {
-		log.Println(c)
-	}
-
 	cookie, err = r.Cookie("token")
-	if err != nil {
-		cookie = cookie_handler.CreateCookie()
-	}
-
-	if !cookie_handler.CheckCookie(cookie) {
+	if err != nil || cookie_handler.CheckCookie(cookie){
 		cookie = cookie_handler.CreateCookie()
 	}
 
