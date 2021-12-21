@@ -51,7 +51,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	log.Println(marshaled)
+	log.Printf("%s", marshaled)
 
 	w.WriteHeader(200)
 
