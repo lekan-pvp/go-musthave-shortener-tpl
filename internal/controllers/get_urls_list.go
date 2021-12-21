@@ -28,6 +28,8 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	http.SetCookie(w, cookie)
+
 	values := strings.Split(cookie.Value, ":")
 	uuid := values[0]
 
