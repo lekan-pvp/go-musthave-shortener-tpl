@@ -17,10 +17,10 @@ type URLS struct {
 }
 
 var out []models.URLs
-type ResultSlice []*URLS
+type ResultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
-	var resultSlice *ResultSlice
+	var resultSlice  = New()
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -32,7 +32,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	uuid := values[0]
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
-	resultSlice = resultList(out)
+	resultSlice.Add(out)
 
 	log.Println(resultSlice)
 
@@ -58,26 +58,18 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	w.Write(marshaled)
 }
 
-func resultList(out []models.URLs) *ResultSlice {
-	var result ResultSlice
+func (r *ResultSlice) Add(out []models.URLs) {
 	for _, v := range out {
-		result = append(result, &URLS{ShortURL: v.ShortURL, OriginalURL: v.OriginalURL})
+		pnew := URLS{
+			ShortURL: v.ShortURL,
+			OriginalURL: v.OriginalURL,
+		}
+		*r = append(*r, pnew)
 	}
-	return &result
 }
 
-//func (u *URLS) MarshalJSON() ([]byte, error) {
-//	arr := []interface{}{u.ShortURL, u.OriginalURL}
-//	return json.Marshal(arr)
-//}
-//
-//func (u *URLS) UnmarshalJSON(bs []byte) error {
-//	arr := []interface{}{}
-//	err := json.Unmarshal(bs, &arr)
-//	if err != nil {
-//		return err
-//	}
-//	u.ShortURL = arr[0].(string)
-//	u.OriginalURL = arr[1].(string)
-//	return nil
-//}
+func New() *ResultSlice {
+	var arr ResultSlice
+	return &arr
+}
+
