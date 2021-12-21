@@ -38,16 +38,16 @@ func New(filename string) *URLsRepository {
 }
 
 func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
-	short := key_gen.KeyGen()
 	for {
+		short := key_gen.KeyGen()
 		if ok := repo.set(short, orig); ok {
 			repo.setUser(uuid, short, orig)
 			if err := repo.save(uuid, short, orig); err != nil {
 				log.Println("error saving to URLStore:", err)
 				return "", err
 			}
+			return short, nil
 		}
-		return short, nil
 	}
 }
 
@@ -97,7 +97,8 @@ func (repo *URLsRepository) load() error  {
 	for err == nil {
 		var r models.URLs
 		if err = d.Decode(&r); err == nil {
-			repo.set(r.UUID, r.ShortURL, r.OriginalURL)
+			repo.setUser(r.UUID, r.ShortURL, r.OriginalURL)
+			repo.set(r.ShortURL, r.OriginalURL)
 		}
 	}
 	if err == io.EOF {
