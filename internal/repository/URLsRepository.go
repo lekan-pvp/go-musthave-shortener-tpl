@@ -51,11 +51,14 @@ func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 }
 
 func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
-	var user []models.URLs
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
-	
+
+	var user []models.URLs
+
 	log.Println("From GetURLsList: ")
+	log.Println(repo.users)
+
 	for _, v := range repo.users {
 		if v.UUID == uuid {
 			user = append(user, models.URLs{

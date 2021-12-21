@@ -3,35 +3,22 @@ package cookie_handler
 import (
 	"crypto/hmac"
 	"crypto/sha256"
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/go-musthave-shortener-tpl/internal/generate_random"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
 var key = []byte("secret key")
 
+
 func CreateCookie() *http.Cookie {
-	gen, err := generate_random.GenerateRandom(16)
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
 
-	data, err := hex.DecodeString(fmt.Sprintf("%x", gen))
-	if err != nil {
-		log.Fatal(err)
-		return nil
-	}
+	id := uuid.NewString()
 
-	uid := binary.BigEndian.Uint32(data[:4])
-	id:= strconv.Itoa(int(uid))
-
-	log.Println("IN CreateCookie:", id, uid)
+	log.Println("IN CreateCookie:", id)
 
 	h := hmac.New(sha256.New, key)
 	h.Write([]byte(id))
@@ -67,3 +54,4 @@ func CheckCookie(cookie *http.Cookie) bool {
 		return false
 	}
 }
+
