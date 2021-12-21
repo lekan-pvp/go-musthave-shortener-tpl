@@ -29,14 +29,13 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	cookie, err = r.Cookie("token")
 	if err != nil {
 		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
 	}
 
 	if !cookie_handler.CheckCookie(cookie) {
 		cookie = cookie_handler.CreateCookie()
-		http.SetCookie(w, cookie)
 	}
 
+	http.SetCookie(w, cookie)
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
 
