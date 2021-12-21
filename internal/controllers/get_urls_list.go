@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
@@ -56,10 +55,6 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	log.Printf("%s", marshaled)
 
 	w.WriteHeader(200)
-
-	var buf bytes.Buffer
-
-
 
 	fmt.Fprint(w, marshaled)
 }
