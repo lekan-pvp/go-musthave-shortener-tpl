@@ -36,7 +36,6 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
 	log.Println("OUT=", out)
 	resultSlice = controller.resultList(out)
-	log.Println("resultSlice=", ResultSlice)
 
 	if len(resultSlice) == 0 {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
