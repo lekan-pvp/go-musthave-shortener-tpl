@@ -13,7 +13,7 @@ import (
 )
 
 type URLsRepository struct {
-	URLRepository interfaces.IURLRepository
+	interfaces.IURLRepository
 	mu sync.RWMutex
 	users []models.URLs
 	urls map[string]string
