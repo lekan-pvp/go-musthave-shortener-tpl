@@ -32,8 +32,9 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	uuid := values[0]
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
-	log.Println("OUT=", out)
 	resultSlice = controller.resultList(out)
+
+	log.Println(resultSlice)
 
 	if len(resultSlice) == 0 {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -44,21 +45,26 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	encoder := json.NewEncoder(w)
-	err = encoder.Encode(resultSlice)
+	marshaled, err := json.Marshal(resultSlice)
 	if err != nil {
-		log.Println(err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
 	w.WriteHeader(200)
 
+	w.Write(marshaled)
 }
 
-func (controller *Controller) resultList(out []models.URLs) []URLS {
+func (controller *Controller) resultList(out []models.URLs) ResultSlice {
 	var result []URLS
 	for _, v := range out {
 		result = append(result, URLS{ShortURL: v.ShortURL, OriginalURL: v.OriginalURL})
 	}
 	return result
+}
+
+func (u *URLS) MarshalJSON() ([]byte, error) {
+	arr := []interface{}{u.ShortURL, u.OriginalURL}
+	return json.Marshal(arr)
 }
