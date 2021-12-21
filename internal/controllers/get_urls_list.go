@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"log"
@@ -17,9 +19,10 @@ type URLS struct {
 }
 
 var out []models.URLs
-var ResultSlice []URLS
+type ResultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
+	var resultSlice ResultSlice
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -32,10 +35,10 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 
 	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
 	log.Println("OUT=", out)
-	ResultSlice = controller.resultList(out)
+	resultSlice = controller.resultList(out)
 	log.Println("resultSlice=", ResultSlice)
 
-	if len(ResultSlice) == 0 {
+	if len(resultSlice) == 0 {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return
@@ -43,12 +46,17 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	if err:= json.NewEncoder(w).Encode(ResultSlice); err != nil {
+
+	buf := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(buf)
+	err = encoder.Encode(resultSlice)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	w.WriteHeader(200)
+	fmt.Fprint(w, buf)
 }
 
 func (controller *Controller) resultList(out []models.URLs) []URLS {
