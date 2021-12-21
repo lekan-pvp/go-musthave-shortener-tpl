@@ -28,6 +28,7 @@ func CreateCookie() *http.Cookie {
 		Name: "token",
 		Value: fmt.Sprintf("%s:%x", id, dst),
 		Path: "/",
+		MaxAge: 300,
 	}
 	return cookie
 }
@@ -50,7 +51,7 @@ func CheckCookie(cookie *http.Cookie) bool {
 	h.Write([]byte(id))
 	sign := h.Sum(nil)
 
-	if hmac.Equal(sign, []byte(data)) {
+	if hmac.Equal(sign, data) {
 		return true
 	} else {
 		return false
