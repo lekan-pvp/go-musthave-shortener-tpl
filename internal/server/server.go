@@ -2,9 +2,10 @@ package server
 
 import (
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-musthave-shortener-tpl/internal/config"
 	"github.com/go-musthave-shortener-tpl/internal/controllers"
-	"github.com/go-musthave-shortener-tpl/internal/middleware"
+	"github.com/go-musthave-shortener-tpl/internal/mware"
 	"github.com/go-musthave-shortener-tpl/internal/repository"
 	"github.com/go-musthave-shortener-tpl/internal/services"
 	"log"
@@ -20,11 +21,16 @@ func Run() {
 
 	router := chi.NewRouter()
 
+	router.Use(middleware.Logger)
 
 	router.Get("/user/urls", urlController.GetUserURLs)
-	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/", urlController.AddURL)
-	router.With(middleware.GzipHandle).Get("/{articleID}", urlController.GetURLByID)
-	router.With(middleware.RequestHandle, middleware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
+	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", urlController.AddURL)
+	router.Route("/{articleID:[a-zA-Z]+}", func(r chi.Router) {
+		r.Use(mware.GzipHandle)
+		r.Get("/", urlController.GetURLByID)
+	})
+	//router.With(mware.GzipHandle).Get("/{articleID}", urlController.GetURLByID)
+	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
 
 
 	log.Println("creating router...")
