@@ -7,6 +7,7 @@ import (
 	"github.com/go-musthave-shortener-tpl/internal/interfaces"
 	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/go-musthave-shortener-tpl/internal/models"
+	_ "github.com/lib/pq"
 	"io"
 	"log"
 	"os"
@@ -27,6 +28,7 @@ func New(filename, connStr string) *URLsRepository {
 	if err != nil {
 		log.Fatal("error connecting to DB:", err)
 	}
+
 	s := &URLsRepository {
 		urls: make(map[string]string),
 		DB: db,

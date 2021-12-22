@@ -1,16 +1,9 @@
 package repository
 
-import (
-	"context"
-	"time"
-)
+import "context"
 
 func (repo *URLsRepository) CheckPingDB(ctx context.Context) error {
-	timeoutDur := time.Second * 1
-	ctx2, cancel := context.WithTimeout(ctx, timeoutDur)
-	defer cancel()
-
-	if err := repo.DB.PingContext(ctx2); err != nil {
+	if err := repo.DB.PingContext(ctx); err != nil {
 		return err
 	}
 	return nil

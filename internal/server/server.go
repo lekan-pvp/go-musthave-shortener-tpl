@@ -37,6 +37,7 @@ func Run() {
 	log.Println("creating router...")
 	log.Println("start application")
 	log.Println("server is listening port", cfg.ServerAddress)
+	log.Println("db connect at", cfg.DatabaseDSN)
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddress, router))
 }
