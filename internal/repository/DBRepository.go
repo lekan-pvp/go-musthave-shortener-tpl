@@ -12,4 +12,11 @@ func (repo *URLsRepository) CheckPingDB(ctx context.Context) error {
 	return nil
 }
 
+func (repo *URLsRepository) CloseDBRepo() error {
+	err := repo.DB.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 

@@ -10,4 +10,5 @@ type IURLRepository interface {
 	URLsDetail(url string) (string, error)
 	GetURLsList(uuid, baseURL string) []models.URLs
 	CheckPingDB(ctx context.Context) error
+	CloseDBRepo() error
 }

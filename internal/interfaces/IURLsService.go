@@ -10,4 +10,5 @@ type IURLsService interface {
 	GetURLs(short string) (string, error)
 	ListByUUID(uuid, baseURL string) []models.URLs
 	PingDB(ctx context.Context) error
+	CloseDB() error
 }

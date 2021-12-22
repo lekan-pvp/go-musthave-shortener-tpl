@@ -26,7 +26,15 @@ func (service *Service) ListByUUID(uuid, baseURL string) []models.URLs {
 }
 
 func (service *Service) PingDB(ctx context.Context) error {
-	if err := service.PingDB(ctx); err != nil {
+	if err := service.CheckPingDB(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service *Service) CloseDB() error {
+	err := service.CloseDBRepo()
+	if err != nil {
 		return err
 	}
 	return nil

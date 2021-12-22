@@ -15,6 +15,9 @@ func (controller *Controller) PingDBHandler(w http.ResponseWriter, r *http.Reque
 	err := controller.PingDB(ctx)
 
 	if err != nil {
+		if err = controller.CloseDB(); err != nil {
+			panic(err)
+		}
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(500)
 		return
