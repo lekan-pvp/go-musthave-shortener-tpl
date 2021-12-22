@@ -15,21 +15,23 @@ import (
 func Run() {
 	cfg := config.New()
 
-	urlRepo := repository.New(cfg.FileStoragePath)
-	urlService := &services.URLsService{urlRepo}
-	urlController := controllers.Controller{urlService, cfg}
+	repo := repository.New(cfg.FileStoragePath, cfg.DatabaseDSN)
+	service := &services.Service{repo}
+	controller := controllers.Controller{service, cfg}
 
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
 
-	router.Get("/user/urls", urlController.GetUserURLs)
-	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", urlController.AddURL)
+	router.Get("/user/urls", controller.GetUserURLs)
+	router.Get("/ping", controller.PingDBHandler)
+	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.AddURL)
 	router.Route("/{articleID:[a-zA-Z]+}", func(r chi.Router) {
 		r.Use(mware.GzipHandle)
-		r.Get("/", urlController.GetURLByID)
+		r.Get("/", controller.GetURLByID)
 	})
-	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", urlController.APIShorten)
+	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", controller.APIShorten)
+
 
 
 	log.Println("creating router...")
