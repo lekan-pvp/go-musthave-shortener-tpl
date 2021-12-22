@@ -27,6 +27,7 @@ func CreateCookie() *http.Cookie {
 	cookie := &http.Cookie{
 		Name: "token",
 		Value: fmt.Sprintf("%s:%x", id, dst),
+		Path: "/",
 	}
 	return cookie
 }

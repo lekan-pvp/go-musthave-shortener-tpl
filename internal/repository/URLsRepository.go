@@ -40,7 +40,8 @@ func New(filename string) *URLsRepository {
 func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 	for {
 		short := key_gen.KeyGen()
-		if ok := repo.set(uuid, short, orig); ok {
+		if ok := repo.set(short, orig); ok {
+			repo.setUser(uuid, short, orig)
 			if err := repo.save(uuid, short, orig); err != nil {
 				log.Println("error saving to URLStore:", err)
 				return "", err
@@ -95,7 +96,8 @@ func (repo *URLsRepository) load() error  {
 	for err == nil {
 		var r models.URLs
 		if err = d.Decode(&r); err == nil {
-			repo.set(r.UUID, r.ShortURL, r.OriginalURL)
+			repo.setUser(r.UUID, r.ShortURL, r.OriginalURL)
+			repo.set(r.ShortURL, r.OriginalURL)
 		}
 	}
 	if err == io.EOF {
@@ -104,10 +106,15 @@ func (repo *URLsRepository) load() error  {
 	return err
 }
 
-func (repo *URLsRepository) set(uuid, short, orig string) bool {
+func (repo *URLsRepository) setUser(uuid, short, orig string) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 	repo.users = append(repo.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
+}
+
+func (repo *URLsRepository) set(short, orig string) bool {
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 	if _, present := repo.urls[short]; present {
 		return false
 	}
