@@ -9,7 +9,7 @@ import (
 
 
 func (controller *Controller) PingDBHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), 250*time.Millisecond)
+	ctx, cancel := context.WithTimeout(r.Context(), 250*time.Millisecond)
 	defer cancel()
 
 	err := controller.PingDB(ctx)
