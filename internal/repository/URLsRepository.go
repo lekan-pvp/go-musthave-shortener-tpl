@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"github.com/go-musthave-shortener-tpl/internal/interfaces"
 	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/go-musthave-shortener-tpl/internal/models"
+	_ "github.com/lib/pq"
 	"io"
 	"log"
 	"os"
@@ -18,13 +20,18 @@ type URLsRepository struct {
 	users []models.URLs
 	urls map[string]string
 	file *os.File
+	DB *sql.DB
 }
 
+func New(filename, connStr string) *URLsRepository {
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal("error connecting to DB:", err)
+	}
 
-
-func New(filename string) *URLsRepository {
 	s := &URLsRepository {
 		urls: make(map[string]string),
+		DB: db,
 	}
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
