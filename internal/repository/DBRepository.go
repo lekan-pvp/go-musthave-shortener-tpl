@@ -36,7 +36,7 @@ func (repo *Repository) CreateTableDBRepo(ctx context.Context, tableName string)
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 	tblname := pq.QuoteIdentifier(tableName)
-	_, err := db.ExecContext(ctx2, fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);", tblname))
+	_, err := db.ExecContext(ctx2, fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);", tblname))
 
 	if err != nil {
 		log.Println("in CreateTableDBRepo:", err)
