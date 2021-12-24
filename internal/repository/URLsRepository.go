@@ -14,8 +14,8 @@ import (
 	"sync"
 )
 
-type URLsRepository struct {
-	interfaces.IURLRepository
+type Repository struct {
+	interfaces.IRepository
 	mu sync.RWMutex
 	users []models.URLs
 	urls map[string]string
@@ -23,13 +23,13 @@ type URLsRepository struct {
 	DB *sql.DB
 }
 
-func New(filename, connStr string) *URLsRepository {
+func New(filename, connStr string) *Repository {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("error connecting to DB:", err)
 	}
 
-	s := &URLsRepository {
+	s := &Repository{
 		urls: make(map[string]string),
 		DB: db,
 	}
@@ -44,7 +44,7 @@ func New(filename, connStr string) *URLsRepository {
 	return s
 }
 
-func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
+func (repo *Repository) StoreURL(uuid string, orig string) (string, error) {
 	for {
 		short := key_gen.KeyGen()
 		if ok := repo.set(short, orig); ok {
@@ -58,7 +58,7 @@ func (repo *URLsRepository) StoreURL(uuid string, orig string) (string, error) {
 	}
 }
 
-func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
+func (repo *Repository) GetURLsList(uuid, baseURL string) []models.URLs {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 
@@ -79,7 +79,7 @@ func (repo *URLsRepository) GetURLsList(uuid, baseURL string) []models.URLs {
 	return user
 }
 
-func (repo *URLsRepository) URLsDetail(short string) (string, error) {
+func (repo *Repository) URLsDetail(short string) (string, error) {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
 	log.Println("From URLsDetail:")
@@ -90,12 +90,12 @@ func (repo *URLsRepository) URLsDetail(short string) (string, error) {
 	return url, nil
 }
 
-func (repo *URLsRepository) save(uuid string, short, orig string) error {
+func (repo *Repository) save(uuid string, short, orig string) error {
 	e := json.NewEncoder(repo.file)
 	return e.Encode(models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
 }
 
-func (repo *URLsRepository) load() error  {
+func (repo *Repository) load() error  {
 	if _, err := repo.file.Seek(0, 0); err != nil {
 		return err
 	}
@@ -114,13 +114,13 @@ func (repo *URLsRepository) load() error  {
 	return err
 }
 
-func (repo *URLsRepository) setUser(uuid, short, orig string) {
+func (repo *Repository) setUser(uuid, short, orig string) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 	repo.users = append(repo.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
 }
 
-func (repo *URLsRepository) set(short, orig string) bool {
+func (repo *Repository) set(short, orig string) bool {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 	if _, present := repo.urls[short]; present {
