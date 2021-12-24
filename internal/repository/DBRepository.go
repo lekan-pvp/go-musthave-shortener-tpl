@@ -35,7 +35,7 @@ func (repo *Repository) CreateTableDBRepo(ctx context.Context, tableName string)
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 	tblname := pq.QuoteIdentifier(tableName)
-	_, err := db.ExecContext(ctx2, "CREATE TABLE IF NOT EXISTS $1 (id serial PRIMARY KEY, user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);", tblname)
+	_, err := db.ExecContext(ctx2, `CREATE TABLE IF NOT EXISTS $1 (id SERIAL PRIMARY KEY, user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);`, tblname)
 
 	if err != nil {
 		log.Println("in CreateTableDBRepo:", err)
@@ -60,7 +60,7 @@ func (repo *Repository) InsertUserDBRepo(ctx context.Context, tabname string, us
 	short := pq.QuoteIdentifier(shortURL)
 	orig := pq.QuoteIdentifier(origURL)
 
-	_, err := db.ExecContext(ctx2, "INSERT INTO $1(user_id, short_url, orig_url) VALUES ($2, $3, $4);", tblname, id, short, orig)
+	_, err := db.ExecContext(ctx2, `INSERT INTO $1(user_id, short_url, orig_url) VALUES ($2, $3, $4);`, tblname, id, short, orig)
 	if err != nil {
 		log.Println("in InsertUser:", err)
 		return err
