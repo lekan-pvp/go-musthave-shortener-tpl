@@ -6,6 +6,6 @@ import (
 )
 
 type Controller struct {
-	interfaces.IURLsService
+	interfaces.IService
 	Cfg *config.Config
 }

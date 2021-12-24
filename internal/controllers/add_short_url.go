@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -22,12 +23,30 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
 
+	err = controller.CreateTableDB(r.Context(), "users")
+	if err != nil {
+		log.Println("error table create")
+		http.Error(w, err.Error(), 500)
+		return
+	} else {
+		log.Println("Table created")
+	}
+
+	defer func() {
+		err := controller.CloseDB()
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	}()
+
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
 	orig := string(body)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
@@ -36,5 +55,15 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	err = controller.InsertUserDB(r.Context(), "users", uuid, short, orig)
+	if err != nil {
+		log.Println("error insert in users:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	} else {
+		log.Println("user inserted")
+	}
+
 	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
 }
