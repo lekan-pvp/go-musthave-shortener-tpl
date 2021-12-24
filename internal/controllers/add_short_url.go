@@ -58,7 +58,7 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 
 	err = controller.InsertUserDB(r.Context(), "users", uuid, short, orig)
 	if err != nil {
-		log.Println("error insert in users:", err)
+		log.Println("error insert in DB:", err)
 		http.Error(w, err.Error(), 500)
 		return
 	} else {

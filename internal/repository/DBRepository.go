@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -25,12 +26,17 @@ func (repo *Repository) CloseDBRepo() error {
 }
 
 func (repo *Repository) CreateTableDBRepo(ctx context.Context, tableName string) error {
+	if repo.DB == nil {
+		log.Println("You haven`t open the database connection")
+		return errors.New("you haven`t open the database connection")
+	}
+
 	db := repo.DB
 
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 	tblname := pq.QuoteIdentifier(tableName)
-	_, err := db.ExecContext(ctx2, fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (user_id PRIMARY KEY, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);", tblname))
+	_, err := db.ExecContext(ctx2, fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);", tblname))
 
 	if err != nil {
 		log.Println("in CreateTableDBRepo:", err)
@@ -40,6 +46,11 @@ func (repo *Repository) CreateTableDBRepo(ctx context.Context, tableName string)
 }
 
 func (repo *Repository) InsertUserDBRepo(ctx context.Context, tabname string, userID string, shortURL string, origURL string) error {
+	if repo.DB == nil {
+		log.Println("You haven`t open the database connection")
+		return errors.New("you haven`t open the database connection")
+	}
+
 	db := repo.DB
 
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)

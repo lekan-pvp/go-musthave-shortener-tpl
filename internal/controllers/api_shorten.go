@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -36,6 +37,23 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
 
+	err = controller.CreateTableDB(r.Context(), "users")
+	if err != nil {
+		log.Println("error create table", err)
+		http.Error(w, err.Error(), 500)
+		return
+	} else {
+		log.Println("Table created")
+	}
+
+	defer func() {
+		err := controller.CloseDB()
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+	}()
+
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
@@ -61,5 +79,15 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), 500)
 		return
 	}
+
+	err = controller.InsertUserDB(r.Context(), "users", uuid, short.Key, long.Url)
+	if err != nil {
+		log.Println("error insert in DB:", err)
+		http.Error(w, err.Error(), 500)
+		return
+	} else {
+		log.Println("user inserted")
+	}
+
 	w.Write([]byte(result))
 }
