@@ -35,6 +35,7 @@ func (repo *Repository) InsertUserDBRepo(ctx context.Context, userID string, sho
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
+	log.Println("IN InsertUserDBRepo short url =", shortURL)
 	_, err := db.ExecContext(ctx2, `INSERT INTO users(user_id, short_url, orig_url) VALUES ($1, $2, $3);`, userID, shortURL, origURL)
 	if err != nil {
 		log.Println("in InsertUser:", err)
@@ -54,6 +55,8 @@ func (repo *Repository) GetOrigByShortDBRepo(ctx context.Context, shortURL strin
 
 	ctx2, stop := context.WithTimeout(ctx, 1*time.Second)
 	defer stop()
+
+	log.Println("In GetOrigByShortDBRepo: short url =", shortURL)
 
 	err := db.QueryRowContext(ctx2, `SELECT orig_url FROM users WHERE short_url=$1;`, shortURL).Scan(&result)
 	if err != nil {

@@ -94,7 +94,6 @@ func (repo *Repository) GetURLsList(uuid, baseURL string) []models.URLs {
 func (repo *Repository) URLsDetail(short string) (string, error) {
 	repo.mu.RLock()
 	defer repo.mu.RUnlock()
-	log.Println("From URLsDetail:")
 	url, ok := repo.urls[short]
 	if !ok {
 		return "", errors.New("short URL not found")

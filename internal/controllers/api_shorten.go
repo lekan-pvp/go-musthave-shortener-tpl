@@ -61,7 +61,8 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = controller.InsertUserDB(r.Context(), uuid, short.Key, long.Url)
+
+	err = controller.InsertUserDB(r.Context(), uuid, shortURL, long.Url)
 	if err != nil {
 		log.Println("error insert in DB:", err)
 		http.Error(w, err.Error(), 500)
@@ -69,8 +70,6 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	} else {
 		log.Println("")
 	}
-
-
 
 	w.Write([]byte(result))
 }
