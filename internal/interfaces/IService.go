@@ -11,6 +11,7 @@ type IService interface {
 	ListByUUID(uuid, baseURL string) []models.URLs
 	PingDB(ctx context.Context) error
 	CloseDB() error
-	CreateTableDB(ctx context.Context, name string) error
-	InsertUserDB(ctx context.Context, tabname string, userID string, shortURL string, origURL string) error
+	InsertUserDB(ctx context.Context, userID string, shortURL string, origURL string) error
+	GetOrigByShortDB(ctx context.Context, shortURL string) (string, error)
+	GetURLsListDB(ctx context.Context, uuid string) ([]models.URLs, error)
 }

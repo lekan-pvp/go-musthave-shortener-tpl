@@ -11,6 +11,7 @@ type IRepository interface {
 	GetURLsList(uuid, baseURL string) []models.URLs
 	CheckPingDB(ctx context.Context) error
 	CloseDBRepo() error
-	CreateTableDBRepo(ctx context.Context, name string) error
-	InsertUserDBRepo(ctx context.Context,tabname string, userID string, shortURL string, origURL string) error
+	InsertUserDBRepo(ctx context.Context, userID string, shortURL string, origURL string) error
+	GetOrigByShortDBRepo(ctx context.Context, shortURL string) (string, error)
+	GetURLsListDBRepo(ctx context.Context, uuid string) ([]models.URLs, error)
 }

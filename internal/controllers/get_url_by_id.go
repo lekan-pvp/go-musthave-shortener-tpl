@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"context"
 	"github.com/go-chi/chi"
 	"log"
 	"net/http"
+	"time"
 )
 
 func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
@@ -13,6 +15,16 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "url is empty", 404)
 		return
 	}
+
+	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
+	defer stop()
+
+	orig, err := controller.GetOrigByShortDB(ctx, short)
+	if err != nil {
+		http.Error(w, err.Error(), 404)
+		return
+	}
+
 	url, err := controller.GetURLs(short)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
@@ -23,7 +35,9 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	log.Printf("In get_url_by_id: %s == %s\n", orig, url)
+
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Location", url)
+	w.Header().Set("Location", orig)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

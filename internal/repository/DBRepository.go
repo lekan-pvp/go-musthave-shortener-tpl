@@ -2,8 +2,9 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
-	"github.com/lib/pq"
+	"github.com/go-musthave-shortener-tpl/internal/models"
 	_ "github.com/lib/pq"
 	"log"
 	"time"
@@ -24,27 +25,7 @@ func (repo *Repository) CloseDBRepo() error {
 	return nil
 }
 
-func (repo *Repository) CreateTableDBRepo(ctx context.Context, tableName string) error {
-	if repo.DB == nil {
-		log.Println("You haven`t open the database connection")
-		return errors.New("you haven`t open the database connection")
-	}
-
-	db := repo.DB
-
-	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
-	defer cancel()
-	tblname := pq.QuoteIdentifier(tableName)
-	_, err := db.ExecContext(ctx2, `CREATE TABLE IF NOT EXISTS $1 (id SERIAL PRIMARY KEY, user_id UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL);`, tblname)
-
-	if err != nil {
-		log.Println("in CreateTableDBRepo:", err)
-		return err
-	}
-	return nil
-}
-
-func (repo *Repository) InsertUserDBRepo(ctx context.Context, tabname string, userID string, shortURL string, origURL string) error {
+func (repo *Repository) InsertUserDBRepo(ctx context.Context, userID string, shortURL string, origURL string) error {
 	if repo.DB == nil {
 		log.Println("You haven`t open the database connection")
 		return errors.New("you haven`t open the database connection")
@@ -55,15 +36,61 @@ func (repo *Repository) InsertUserDBRepo(ctx context.Context, tabname string, us
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 
-	tblname := pq.QuoteIdentifier(tabname)
-	id := pq.QuoteIdentifier(userID)
-	short := pq.QuoteIdentifier(shortURL)
-	orig := pq.QuoteIdentifier(origURL)
-
-	_, err := db.ExecContext(ctx2, `INSERT INTO $1(user_id, short_url, orig_url) VALUES ($2, $3, $4);`, tblname, id, short, orig)
+	_, err := db.ExecContext(ctx2, `INSERT INTO users(user_id, short_url, orig_url) VALUES ($1, $2, $3);`, userID, shortURL, origURL)
 	if err != nil {
 		log.Println("in InsertUser:", err)
 		return err
 	}
 	return nil
+}
+
+func (repo *Repository) GetOrigByShortDBRepo(ctx context.Context, shortURL string) (string, error)  {
+	var result sql.NullString
+	if repo.DB == nil {
+		log.Println("You haven`t open the database connection")
+		return "", errors.New("you haven`t open the database connection")
+	}
+
+	db := repo.DB
+
+	ctx2, stop := context.WithTimeout(ctx, 1*time.Second)
+	defer stop()
+
+	err := db.QueryRowContext(ctx2, `SELECT orig_url FROM users WHERE short_url=$1;`, shortURL).Scan(&result)
+	if err != nil {
+		return "", err
+	}
+
+	log.Println("ORIG URL=", result)
+
+	return result.String, nil
+}
+
+func (repo *Repository) GetURLsListDBRepo(ctx context.Context, uuid string) ([]models.URLs, error) {
+	var user []models.URLs
+
+	db := repo.DB
+
+	ctx2, stop := context.WithTimeout(ctx, 1*time.Second)
+	defer stop()
+
+	rows, err := db.QueryContext(ctx2, `SELECT user_id, short_url, orig_url FROM users WHERE user_id=$1`, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var v models.URLs
+		err = rows.Scan(&v.UUID, &v.ShortURL, &v.OriginalURL)
+		if err != nil {
+			return nil, err
+		}
+		user = append(user, v)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

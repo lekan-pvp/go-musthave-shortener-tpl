@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -12,6 +13,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 type Repository struct {
@@ -28,6 +30,16 @@ func New(filename, connStr string) *Repository {
 	if err != nil {
 		log.Fatal("error connecting to DB:", err)
 	}
+
+	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
+	defer stop()
+
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(50) UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL, PRIMARY KEY (user_id));`)
+	if err != nil {
+		log.Fatal("error create table in DB", err)
+	}
+
+	log.Println(result)
 
 	s := &Repository{
 		urls: make(map[string]string),

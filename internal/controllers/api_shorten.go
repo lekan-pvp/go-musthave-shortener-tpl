@@ -17,8 +17,6 @@ type long struct {
 	Url string	`json:"url"`
 }
 
-
-
 func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {
 	short := short{}
 	long := long{}
@@ -36,23 +34,6 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 
 	values := strings.Split(cookie.Value, ":")
 	uuid = values[0]
-
-	err = controller.CreateTableDB(r.Context(), "users")
-	if err != nil {
-		log.Println("error create table", err)
-		http.Error(w, err.Error(), 500)
-		return
-	} else {
-		log.Println("Table created")
-	}
-
-	defer func() {
-		err := controller.CloseDB()
-		if err != nil {
-			log.Fatal(err)
-			return
-		}
-	}()
 
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -80,14 +61,16 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = controller.InsertUserDB(r.Context(), "users", uuid, short.Key, long.Url)
+	err = controller.InsertUserDB(r.Context(), uuid, short.Key, long.Url)
 	if err != nil {
 		log.Println("error insert in DB:", err)
 		http.Error(w, err.Error(), 500)
 		return
 	} else {
-		log.Println("user inserted")
+		log.Println("")
 	}
+
+
 
 	w.Write([]byte(result))
 }

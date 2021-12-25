@@ -15,6 +15,8 @@ import (
 func Run() {
 	cfg := config.New()
 
+	log.Println(cfg.DatabaseDSN)
+
 	repo := repository.New(cfg.FileStoragePath, cfg.DatabaseDSN)
 	service := &services.Service{repo}
 	controller := controllers.Controller{service, cfg}
