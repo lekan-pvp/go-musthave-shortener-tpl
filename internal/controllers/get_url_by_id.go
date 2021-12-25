@@ -25,6 +25,11 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	if orig == "" {
+		http.NotFound(w, r)
+		return
+	}
+
 	url, err := controller.GetURLs(short)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
