@@ -34,7 +34,7 @@ func New(filename, connStr string) *Repository {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(50) UNIQUE NOT NULL, short_url VARCHAR(50) NOT NULL, orig_url VARCHAR(50) NOT NULL, PRIMARY KEY (user_id));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(100) UNIQUE NOT NULL, short_url VARCHAR(100) NOT NULL, orig_url VARCHAR(100) NOT NULL, PRIMARY KEY (user_id));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
