@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	_ "github.com/lib/pq"
@@ -45,7 +44,7 @@ func (repo *Repository) InsertUserDBRepo(ctx context.Context, userID string, sho
 }
 
 func (repo *Repository) GetOrigByShortDBRepo(ctx context.Context, shortURL string) (string, error)  {
-	var result sql.NullString
+	var result string
 	if repo.DB == nil {
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
@@ -63,7 +62,7 @@ func (repo *Repository) GetOrigByShortDBRepo(ctx context.Context, shortURL strin
 
 	log.Println("ORIG URL=", result)
 
-	return result.String, nil
+	return result, nil
 }
 
 func (repo *Repository) GetURLsListDBRepo(ctx context.Context, uuid string) ([]models.URLs, error) {
