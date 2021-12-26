@@ -36,6 +36,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 }
 
 func (s *DBRepository) CheckPingRepo(ctx context.Context) error {
+	log.Println("IN DB:")
 	if err := s.DB.PingContext(ctx); err != nil {
 		return err
 	}
@@ -44,12 +45,14 @@ func (s *DBRepository) CheckPingRepo(ctx context.Context) error {
 
 
 func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
+	log.Println("IN DB:")
 	db := s.DB
 
 	if db == nil {
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
 	}
+
 
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
@@ -64,6 +67,7 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 }
 
 func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error)  {
+	log.Println("IN DB:")
 	var result string
 	if s.DB == nil {
 		log.Println("You haven`t open the database connection")
@@ -88,6 +92,7 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 }
 
 func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error) {
+	log.Println("IN DB:")
 	var user []models.URLs
 
 	db := s.DB
