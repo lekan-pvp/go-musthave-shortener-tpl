@@ -46,9 +46,11 @@ func Run() {
 }
 
 func New(cfg *config.Config) interfaces.Storager {
+	log.Println("cfg.FileStoragePath =", cfg.FileStoragePath)
 	if cfg.FileStoragePath != "" {
 		return &repository_memory.MemoryRepository{}
 	}
+	log.Println("cfg.DatabaseDSN =", cfg.DatabaseDSN)
 	if cfg.DatabaseDSN != "" {
 		return &repository_db.DBRepository{}
 	}
