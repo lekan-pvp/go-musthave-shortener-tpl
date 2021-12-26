@@ -32,10 +32,7 @@ func Run() {
 	router.Get("/user/urls", controller.GetUserURLs)
 	router.Get("/ping", controller.PingDBHandler)
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.AddURL)
-	router.Route("/{articleID:[a-zA-Z]+}", func(r chi.Router) {
-		r.Use(mware.GzipHandle)
-		r.Get("/", controller.GetURLByID)
-	})
+	router.With(mware.GzipHandle).Get("/{articleID}", controller.GetURLByID)
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", controller.APIShorten)
 
 

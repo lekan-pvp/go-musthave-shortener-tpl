@@ -34,12 +34,8 @@ func New() *Config {
 
 	instance.ServerAddress = *serverAddressPtr
 	instance.BaseURL = *baseURLPtr
-
-	if fileStoragePathPtr == nil {
-		instance.DatabaseDSN = *databaseDSN
-	} else {
-		instance.FileStoragePath = *fileStoragePathPtr
-	}
+	instance.DatabaseDSN = *databaseDSN
+	instance.FileStoragePath = *fileStoragePathPtr
 
 	return instance
 }
