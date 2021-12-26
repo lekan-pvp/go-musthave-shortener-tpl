@@ -30,12 +30,24 @@ func New() *Config {
 
 	flag.Parse()
 
-
-
 	instance.ServerAddress = *serverAddressPtr
 	instance.BaseURL = *baseURLPtr
-	instance.DatabaseDSN = *databaseDSN
-	instance.FileStoragePath = *fileStoragePathPtr
+
+	if instance.FileStoragePath == "short_url.json" {
+		if fileStoragePathPtr != nil {
+			instance.FileStoragePath = *fileStoragePathPtr
+		} else {
+			instance.FileStoragePath = ""
+		}
+	}
+
+	if instance.DatabaseDSN == "user=postgres password='postgres' dbname=pqgotest sslmode=disable" {
+		if databaseDSN != nil {
+			instance.DatabaseDSN = *databaseDSN
+		} else {
+			instance.DatabaseDSN = ""
+		}
+	}
 
 	return instance
 }
