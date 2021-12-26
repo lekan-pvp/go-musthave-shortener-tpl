@@ -36,7 +36,7 @@ func (s *MemoryRepository) New(cfg *config.Config) {
 
 
 func (s *MemoryRepository) InsertUserRepo(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
-	log.Println("IN MEM:")
+	log.Println("IN MEM: InsertUserRepo")
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.users = append(s.users, models.URLs{UUID: userID, ShortURL: shortURL, OriginalURL: origURL})
@@ -48,7 +48,7 @@ func (s *MemoryRepository) InsertUserRepo(ctx context.Context, userID string, sh
 }
 
 func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error) {
-	log.Println("IN MEM:")
+	log.Println("IN MEM: GetURLsListRepo")
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -70,7 +70,7 @@ func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]
 }
 
 func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (string, error) {
-	log.Println("IN MEM:")
+	log.Println("IN MEM: GetOrigByShortRepo")
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, v := range s.users {
