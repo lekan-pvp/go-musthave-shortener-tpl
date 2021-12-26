@@ -8,4 +8,7 @@ require (
 	github.com/google/uuid v1.3.0
 )
 
-require github.com/lib/pq v1.10.4 // indirect
+require (
+	github.com/itchyny/base58-go v0.2.0 // indirect
+	github.com/lib/pq v1.10.4 // indirect
+)

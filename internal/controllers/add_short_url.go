@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"context"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
+	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"io"
-	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
@@ -30,26 +32,18 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
+	defer stop()
+
 	orig := string(body)
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	short, err := controller.CreateURL(uuid, orig)
+	short := key_gen.GenerateShortLink(orig, uuid)
+	short, err = controller.InsertUser(ctx, uuid, short, orig)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
-
-
-	err = controller.InsertUserDB(r.Context(), uuid, short, orig)
-	if err != nil {
-		log.Println("error insert in DB:", err)
-		http.Error(w, err.Error(), 500)
-		return
-	} else {
-		log.Println("user inserted")
-	}
-
 
 	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
 }

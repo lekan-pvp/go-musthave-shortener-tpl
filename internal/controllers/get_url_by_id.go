@@ -19,7 +19,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
 	defer stop()
 
-	orig, err := controller.GetOrigByShortDB(ctx, short)
+	orig, err := controller.GetOrigByShort(ctx, short)
 	if err != nil {
 		http.Error(w, err.Error(), 404)
 		return
@@ -30,17 +30,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	url, err := controller.GetURLs(short)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		return
-	}
-	if url == "" {
-		http.NotFound(w, r)
-		return
-	}
-
-	log.Printf("In get_url_by_id: %s == %s\n", orig, url)
+	log.Printf("In get_url_by_id: %s\n", orig)
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Header().Set("Location", orig)

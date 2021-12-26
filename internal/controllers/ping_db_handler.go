@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
+	_ "github.com/lib/pq"
 	"net/http"
 	"time"
-	_ "github.com/lib/pq"
 )
 
 
@@ -12,14 +12,9 @@ func (controller *Controller) PingDBHandler(w http.ResponseWriter, r *http.Reque
 	ctx, cancel := context.WithTimeout(r.Context(), 250*time.Millisecond)
 	defer cancel()
 
-	err := controller.PingDB(ctx)
-
+	err := controller.CheckPing(ctx)
 	if err != nil {
-		if err = controller.CloseDB(); err != nil {
-			panic(err)
-		}
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(500)
+		http.Error(w, err.Error(), 500)
 		return
 	}
 

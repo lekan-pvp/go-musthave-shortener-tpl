@@ -30,10 +30,16 @@ func New() *Config {
 
 	flag.Parse()
 
+
+
 	instance.ServerAddress = *serverAddressPtr
 	instance.BaseURL = *baseURLPtr
-	instance.FileStoragePath = *fileStoragePathPtr
-	instance.DatabaseDSN = *databaseDSN
+
+	if fileStoragePathPtr == nil {
+		instance.DatabaseDSN = *databaseDSN
+	} else {
+		instance.FileStoragePath = *fileStoragePathPtr
+	}
 
 	return instance
 }

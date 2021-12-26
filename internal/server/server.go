@@ -5,20 +5,24 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-musthave-shortener-tpl/internal/config"
 	"github.com/go-musthave-shortener-tpl/internal/controllers"
+	"github.com/go-musthave-shortener-tpl/internal/interfaces"
 	"github.com/go-musthave-shortener-tpl/internal/mware"
-	"github.com/go-musthave-shortener-tpl/internal/repository"
-	"github.com/go-musthave-shortener-tpl/internal/services"
+	repository_db "github.com/go-musthave-shortener-tpl/internal/repository-db"
+	repository_memory "github.com/go-musthave-shortener-tpl/internal/repository-memory"
+	"github.com/go-musthave-shortener-tpl/internal/service-memory"
 	"log"
 	"net/http"
 )
 
+
 func Run() {
 	cfg := config.New()
 
-	log.Println(cfg.DatabaseDSN)
+	repo := New(cfg)
 
-	repo := repository.New(cfg.FileStoragePath, cfg.DatabaseDSN)
-	service := &services.Service{repo}
+	repo.New(cfg)
+
+	service := &service_memory.Service{repo}
 	controller := controllers.Controller{service, cfg}
 
 	router := chi.NewRouter()
@@ -42,4 +46,14 @@ func Run() {
 	log.Println("db connect at", cfg.DatabaseDSN)
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddress, router))
+}
+
+func New(cfg *config.Config) interfaces.Storager {
+	if cfg.FileStoragePath != "" {
+		return &repository_memory.MemoryRepository{}
+	}
+	if cfg.DatabaseDSN != "" {
+		return &repository_db.DBRepository{}
+	}
+	return nil
 }

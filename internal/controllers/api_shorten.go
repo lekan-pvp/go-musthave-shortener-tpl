@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
+	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"io"
 	"log"
 	"net/http"
@@ -49,26 +50,22 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusCreated)
-	shortURL, err := controller.CreateURL(uuid, long.Url)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
-	short.Key = controller.Cfg.BaseURL + "/" + shortURL
-	result, err := json.Marshal(&short)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
-	}
 
-
-	err = controller.InsertUserDB(r.Context(), uuid, shortURL, long.Url)
+	shortUrl := key_gen.GenerateShortLink(long.Url, uuid)
+	shortURL, err := controller.InsertUser(r.Context(), uuid, shortUrl, long.Url)
 	if err != nil {
 		log.Println("error insert in DB:", err)
 		http.Error(w, err.Error(), 500)
 		return
 	} else {
 		log.Println("")
+	}
+
+	short.Key = controller.Cfg.BaseURL + "/" + shortURL
+	result, err := json.Marshal(&short)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	w.Write([]byte(result))

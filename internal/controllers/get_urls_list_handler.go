@@ -23,7 +23,6 @@ type ResultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	var resultSlice  = New()
-	var resultDB = New()
 
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie){
@@ -40,24 +39,13 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
 	defer stop()
 
-	outDB, err := controller.GetURLsListDB(ctx, uuid)
+	out, err := controller.GetList(ctx, uuid)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	resultDB.AddDB(outDB, controller.Cfg.BaseURL)
-
-	if resultDB == nil {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(204)
-		return
-	}
-
-	out = controller.ListByUUID(uuid, controller.Cfg.BaseURL)
-	log.Println(out)
-
-	resultSlice.Add(out)
+	resultSlice.Add(out, controller.Cfg.BaseURL)
 
 	if resultSlice == nil {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -65,13 +53,9 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	log.Printf("result == resultSlice = %t", resultDB == resultSlice)
-
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-
-	marshaled, err := json.Marshal(resultDB)
+	marshaled, err := json.Marshal(resultSlice)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -84,17 +68,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	w.Write(marshaled)
 }
 
-func (r *ResultSlice) Add(out []models.URLs) {
-	for _, v := range out {
-		pnew := URLS{
-			ShortURL: v.ShortURL,
-			OriginalURL: v.OriginalURL,
-		}
-		*r = append(*r, pnew)
-	}
-}
-
-func (r *ResultSlice) AddDB(out []models.URLs, baseURL string) {
+func (r *ResultSlice) Add(out []models.URLs, baseURL string) {
 	for _, v := range out {
 		pnew := URLS{
 			ShortURL: baseURL + "/" + v.ShortURL,
