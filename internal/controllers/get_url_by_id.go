@@ -16,6 +16,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 
 	orig, err := controller.GetOrigByShort(r.Context(), short)
 	if err != nil {
+		log.Println("IN ERR HANDLER GetOrigByShort")
 		http.Error(w, err.Error(), 404)
 		return
 	}
