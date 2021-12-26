@@ -1,11 +1,9 @@
 package controllers
 
 import (
-	"context"
 	"github.com/go-chi/chi"
 	"log"
 	"net/http"
-	"time"
 )
 
 func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
@@ -16,10 +14,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
-	defer stop()
-
-	orig, err := controller.GetOrigByShort(ctx, short)
+	orig, err := controller.GetOrigByShort(r.Context(), short)
 	if err != nil {
 		http.Error(w, err.Error(), 404)
 		return
