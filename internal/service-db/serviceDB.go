@@ -10,7 +10,6 @@ type Service struct {
 	interfaces.Storager
 }
 
-
 func (service *Service) InsertUser(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
 	short, err := service.InsertUserRepo(ctx, userID, shortURL, origURL)
 	if err != nil {
@@ -41,4 +40,9 @@ func (service *Service) CheckPing(ctx context.Context) error {
 		return err
 	}
 	return nil
+}
+
+func (service *Service) BanchApi(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult {
+	result := service.BanchApiRepo(ctx, in, shortBase)
+	return result
 }

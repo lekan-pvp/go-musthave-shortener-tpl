@@ -13,7 +13,7 @@ func RequestHandle(next http.Handler) http.Handler {
 		if r.Header.Get("Content-Encoding") == "gzip" {
 			gz, err := gzip.NewReader(r.Body)
 			if err != nil {
-				http.Error(w, err.Error() + "!", http.StatusInternalServerError)
+				http.Error(w, err.Error()+"!", http.StatusInternalServerError)
 				return
 			}
 			reader = gz
@@ -24,7 +24,7 @@ func RequestHandle(next http.Handler) http.Handler {
 
 		req, err := http.NewRequest(r.Method, r.RequestURI, reader)
 		if err != nil {
-			http.Error(w, err.Error() + "!!", http.StatusInternalServerError)
+			http.Error(w, err.Error()+"!!", http.StatusInternalServerError)
 			return
 		}
 		next.ServeHTTP(w, req)

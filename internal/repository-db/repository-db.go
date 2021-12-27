@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/go-musthave-shortener-tpl/internal/config"
+	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	_ "github.com/lib/pq"
 	"log"
@@ -43,7 +44,6 @@ func (s *DBRepository) CheckPingRepo(ctx context.Context) error {
 	return nil
 }
 
-
 func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
 	log.Println("IN DB:")
 	db := s.DB
@@ -52,7 +52,6 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
 	}
-
 
 	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
@@ -66,7 +65,7 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 	return shortURL, nil
 }
 
-func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error)  {
+func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error) {
 	log.Println("IN DB:")
 	var result string
 	if s.DB == nil {
@@ -119,4 +118,13 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *DBRepository) BanchApiRepo(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult {
+	result := make([]models.BatchResult, 0)
+	for _, v := range in {
+		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
+	}
+	return result
 }

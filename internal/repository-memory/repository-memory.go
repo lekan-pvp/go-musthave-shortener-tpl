@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/go-musthave-shortener-tpl/internal/config"
 	"github.com/go-musthave-shortener-tpl/internal/interfaces"
+	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	_ "github.com/lib/pq"
 	"io"
@@ -16,12 +17,10 @@ import (
 
 type MemoryRepository struct {
 	interfaces.Storager
-	mu sync.RWMutex
+	mu    sync.RWMutex
 	users []models.URLs
 	File  *os.File
 }
-
-
 
 func (s *MemoryRepository) New(cfg *config.Config) {
 	f, err := os.OpenFile(cfg.FileStoragePath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
@@ -33,7 +32,6 @@ func (s *MemoryRepository) New(cfg *config.Config) {
 		log.Println("error loading data in Store:", err)
 	}
 }
-
 
 func (s *MemoryRepository) InsertUserRepo(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
 	log.Println("IN MEM: InsertUserRepo")
@@ -60,8 +58,8 @@ func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]
 	for _, v := range s.users {
 		if v.UUID == uuid {
 			user = append(user, models.URLs{
-				UUID: v.UUID,
-				ShortURL: v.ShortURL,
+				UUID:        v.UUID,
+				ShortURL:    v.ShortURL,
 				OriginalURL: v.OriginalURL,
 			})
 		}
@@ -86,7 +84,7 @@ func (s *MemoryRepository) save(uuid string, short, orig string) error {
 	return e.Encode(models.URLs{UUID: uuid, ShortURL: short, OriginalURL: orig})
 }
 
-func (s *MemoryRepository) load() error  {
+func (s *MemoryRepository) load() error {
 	if _, err := s.File.Seek(0, 0); err != nil {
 		return err
 	}
@@ -112,4 +110,14 @@ func (s *MemoryRepository) setUser(uuid, short, orig string) {
 
 func (s *MemoryRepository) CheckPingRepo(ctx context.Context) error {
 	return nil
+}
+
+func (s *MemoryRepository) BanchApiRepo(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult {
+	result := make([]models.BatchResult, 0)
+	for _, v := range in {
+		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
+		s.users = append()
+	}
+	return result
 }

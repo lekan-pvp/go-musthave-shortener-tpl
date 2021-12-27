@@ -12,5 +12,5 @@ type Storager interface {
 	GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error)
 	GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error)
 	CheckPingRepo(ctx context.Context) error
+	BanchApiRepo(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult
 }
-

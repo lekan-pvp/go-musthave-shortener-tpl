@@ -35,4 +35,3 @@ func TestURLsController_AddURL(t *testing.T) {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 }
-

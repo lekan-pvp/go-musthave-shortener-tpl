@@ -13,7 +13,6 @@ import (
 
 var key = []byte("secret key")
 
-
 func CreateCookie() *http.Cookie {
 
 	id := uuid.NewString()
@@ -25,13 +24,12 @@ func CreateCookie() *http.Cookie {
 	dst := h.Sum(nil)
 
 	cookie := &http.Cookie{
-		Name: "token",
+		Name:  "token",
 		Value: fmt.Sprintf("%s:%x", id, dst),
-		Path: "/",
+		Path:  "/",
 	}
 	return cookie
 }
-
 
 func CheckCookie(cookie *http.Cookie) bool {
 	values := strings.Split(cookie.Value, ":")
@@ -56,4 +54,3 @@ func CheckCookie(cookie *http.Cookie) bool {
 		return false
 	}
 }
-

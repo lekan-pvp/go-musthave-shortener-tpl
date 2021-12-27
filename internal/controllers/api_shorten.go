@@ -15,7 +15,7 @@ type short struct {
 }
 
 type long struct {
-	Url string	`json:"url"`
+	Url string `json:"url"`
 }
 
 func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {

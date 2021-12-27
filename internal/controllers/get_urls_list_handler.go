@@ -11,21 +11,20 @@ import (
 	"time"
 )
 
-
-
 type URLS struct {
-	ShortURL string `json:"short_url"`
+	ShortURL    string `json:"short_url"`
 	OriginalURL string `json:"original_url"`
 }
 
 var out []models.URLs
+
 type ResultSlice []URLS
 
 func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
-	var resultSlice  = New()
+	var resultSlice = New()
 
 	cookie, err := r.Cookie("token")
-	if err != nil || !cookie_handler.CheckCookie(cookie){
+	if err != nil || !cookie_handler.CheckCookie(cookie) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return
@@ -71,7 +70,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 func (r *ResultSlice) Add(out []models.URLs, baseURL string) {
 	for _, v := range out {
 		pnew := URLS{
-			ShortURL: baseURL + "/" + v.ShortURL,
+			ShortURL:    baseURL + "/" + v.ShortURL,
 			OriginalURL: v.OriginalURL,
 		}
 		*r = append(*r, pnew)
@@ -82,4 +81,3 @@ func New() *ResultSlice {
 	var arr ResultSlice
 	return &arr
 }
-

@@ -43,8 +43,7 @@ func GzipHandle(next http.Handler) http.Handler {
 	})
 }
 
-
-var contentType  = []string{
+var contentType = []string{
 	"application/javascript",
 	"application/json",
 	"text/css",

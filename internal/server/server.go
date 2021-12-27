@@ -14,7 +14,6 @@ import (
 	"net/http"
 )
 
-
 func Run() {
 	cfg := config.New()
 
@@ -34,8 +33,7 @@ func Run() {
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.AddURL)
 	router.With(mware.GzipHandle).Get("/{articleID}", controller.GetURLByID)
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", controller.APIShorten)
-
-
+	router.Post("/api/shorten/batch", controller.ApiShortenBatch)
 
 	log.Println("creating router...")
 	log.Println("start application")
