@@ -27,7 +27,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(100) UNIQUE NOT NULL, short_url VARCHAR(100) NOT NULL, orig_url VARCHAR(150) NOT NULL, PRIMARY KEY (user_id));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(100) UNIQUE NOT NULL, short_url VARCHAR(100) NOT NULL, orig_url VARCHAR(150) NOT NULL, correlation_id VARCHAR(50), PRIMARY KEY (user_id));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -120,11 +120,35 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 	return user, nil
 }
 
-func (s *DBRepository) BanchApiRepo(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult {
+func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
 	result := make([]models.BatchResult, 0)
+
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(ctx, `INSERT INTO users(user_id, short_url, orig_url, correlation_id) VALUES($1, $2, $3, $4)`)
+	if err != nil {
+		return nil, err
+	}
+
+	defer stmt.Close()
+
 	for _, v := range in {
 		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		if _, err = stmt.ExecContext(ctx, uuid, short, v.OriginalURL, v.CorrelationID); err != nil {
+			return nil, err
+		}
 		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
 	}
-	return result
+
+	if err = tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
+

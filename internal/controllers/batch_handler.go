@@ -6,9 +6,12 @@ import (
 	"github.com/go-musthave-shortener-tpl/internal/models"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Request) {
+	var uuid string
+
 	in := make([]models.BatchIn, 0)
 
 	cookie, err := r.Cookie("token")
@@ -17,6 +20,9 @@ func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Req
 	}
 
 	http.SetCookie(w, cookie)
+
+	values := strings.Split(cookie.Value, ":")
+	uuid = values[0]
 
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -31,7 +37,11 @@ func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	result := controller.BanchApi(r.Context(), in, controller.Cfg.BaseURL)
+	result, err := controller.BanchApi(r.Context(), uuid, in, controller.Cfg.BaseURL)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 
 	inBody, err := json.Marshal(&result)
 	if err != nil {

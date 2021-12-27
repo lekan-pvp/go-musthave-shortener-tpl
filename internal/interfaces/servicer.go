@@ -10,5 +10,5 @@ type Servicer interface {
 	GetOrigByShort(ctx context.Context, shortURL string) (string, error)
 	GetList(ctx context.Context, uuid string) ([]models.URLs, error)
 	CheckPing(ctx context.Context) error
-	BanchApi(ctx context.Context, in []models.BatchIn, shortBase string) []models.BatchResult
+	BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 }
