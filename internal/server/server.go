@@ -32,8 +32,10 @@ func Run() {
 	router.Get("/ping", controller.PingDBHandler)
 	router.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.AddURL)
 	router.With(mware.GzipHandle).Get("/{articleID}", controller.GetURLByID)
-	router.With(mware.RequestHandle, mware.GzipHandle).Post("/api/shorten", controller.APIShorten)
-	router.Post("/api/shorten/batch", controller.ApiShortenBatch)
+	router.Route("/api/shorten", func(r chi.Router) {
+		r.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.APIShorten)
+		r.Post("/batch", controller.ApiShortenBatch)
+	})
 
 	log.Println("creating router...")
 	log.Println("start application")
