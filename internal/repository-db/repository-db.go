@@ -27,7 +27,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(user_id VARCHAR(100) UNIQUE NOT NULL, short_url VARCHAR(100) NOT NULL, orig_url VARCHAR(150) NOT NULL, correlation_id VARCHAR(50), PRIMARY KEY (user_id));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR(100), short_url VARCHAR(100) NOT NULL, orig_url VARCHAR(150) NOT NULL, correlation_id VARCHAR(50), PRIMARY KEY (id));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -141,6 +141,7 @@ func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []model
 	for _, v := range in {
 		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
 		if _, err = stmt.ExecContext(ctx, uuid, short, v.OriginalURL, v.CorrelationID); err != nil {
+			log.Println("error insert in db!")
 			return nil, err
 		}
 		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
