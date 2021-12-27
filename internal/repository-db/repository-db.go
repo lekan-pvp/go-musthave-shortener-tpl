@@ -121,6 +121,7 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 }
 
 func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	log.Println("BanchApiRepo IN DB:")
 	result := make([]models.BatchResult, 0)
 
 	tx, err := s.DB.Begin()

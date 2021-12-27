@@ -113,6 +113,7 @@ func (s *MemoryRepository) CheckPingRepo(ctx context.Context) error {
 }
 
 func (s *MemoryRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	log.Println("BanchApiRepo IN MEMORY:")
 	result := make([]models.BatchResult, 0)
 	for _, v := range in {
 		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
