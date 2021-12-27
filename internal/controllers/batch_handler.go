@@ -50,7 +50,7 @@ func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Req
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(200)
+	w.WriteHeader(201)
 
 	w.Write(inBody)
 }
