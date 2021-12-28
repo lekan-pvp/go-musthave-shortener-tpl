@@ -10,7 +10,7 @@ import (
 type Config struct {
 	ServerAddress   string `env:"SERVER_ADDRESS" envDefault:"localhost:8080"`
 	BaseURL         string `env:"BASE_URL" envDefault:"http://localhost:8080"`
-	FileStoragePath string `env:"FILE_STORAGE_PATH" envDefault:"short_urls.json"`
+	FileStoragePath string `env:"FILE_STORAGE_PATH" envDefault:""`
 	DatabaseDSN     string `env:"DATABASE_DSN" envDefault:"user=postgres password='postgres' dbname=pqgotest sslmode=disable"`
 }
 
@@ -33,7 +33,7 @@ func New() *Config {
 	instance.ServerAddress = *serverAddressPtr
 	instance.BaseURL = *baseURLPtr
 
-	if instance.FileStoragePath == "short_urls.json" {
+	if instance.FileStoragePath == "" {
 		if fileStoragePathPtr != nil {
 			instance.FileStoragePath = *fileStoragePathPtr
 		} else {
