@@ -62,13 +62,16 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 	log.Println("IN InsertUserRepo short url =", shortURL)
 	_, err := db.ExecContext(ctx2, `INSERT INTO users(user_id, short_url, orig_url) VALUES ($1, $2, $3);`, userID, shortURL, origURL)
 
-	if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
-		notOk := db.QueryRowContext(ctx2, `SELECT short_url FROM users WHERE orig_url=$1;`, origURL).Scan(&result)
-		if notOk != nil {
-			return "", notOk
+	if err != nil {
+		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
+			notOk := db.QueryRowContext(ctx2, `SELECT short_url FROM users WHERE orig_url=$1;`, origURL).Scan(&result)
+			if notOk != nil {
+				return "", notOk
+			}
+			return result, err
 		}
-		return result, err
 	}
+
 	return shortURL, nil
 }
 
