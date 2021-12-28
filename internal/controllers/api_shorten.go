@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/key_gen"
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"io"
 	"log"
 	"net/http"
@@ -49,16 +51,19 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusCreated)
+
+	status := http.StatusCreated
 
 	shortUrl := key_gen.GenerateShortLink(long.Url, uuid)
 	shortURL, err := controller.InsertUser(r.Context(), uuid, shortUrl, long.Url)
 	if err != nil {
-		log.Println("error insert in DB:", err)
-		http.Error(w, err.Error(), 500)
-		return
-	} else {
-		log.Println("")
+		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
+			status = http.StatusConflict
+		} else {
+			log.Println("error insert in DB:", err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 
 	short.Key = controller.Cfg.BaseURL + "/" + shortURL
@@ -67,6 +72,6 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
+	w.WriteHeader(status)
 	w.Write([]byte(result))
 }

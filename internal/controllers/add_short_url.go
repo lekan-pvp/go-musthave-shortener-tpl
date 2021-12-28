@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
 	"github.com/go-musthave-shortener-tpl/internal/key_gen"
+	"github.com/jackc/pgerrcode"
+	"github.com/lib/pq"
 	"io"
 	"net/http"
 	"strings"
@@ -36,14 +38,20 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	defer stop()
 
 	orig := string(body)
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.WriteHeader(http.StatusCreated)
+
+	status := http.StatusCreated
 	short := key_gen.GenerateShortLink(orig, uuid)
 	short, err = controller.InsertUser(ctx, uuid, short, orig)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
+		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
+			status = http.StatusConflict
+		} else {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	}
 
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.WriteHeader(status)
 	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
 }
