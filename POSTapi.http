@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/shorten
+Content-Type: application/json; charset=UTF-8
+Cookie: uid=2506540877:37e035d77b20a10d03679485f9609d907273b454da4191877915236db1b08168; Path=/
+
+{
+  "url": "http://google.com"
+}
+
+###
