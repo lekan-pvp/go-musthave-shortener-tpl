@@ -3,8 +3,8 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookie_handler"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"log"
 	"net/http"
 	"strings"

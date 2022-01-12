@@ -2,8 +2,8 @@ package service_memory
 
 import (
 	"context"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 )
 
 type Service struct {
@@ -30,7 +30,7 @@ func (service *Service) CheckPing(ctx context.Context) error {
 	return err
 }
 
-func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)  {
+func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
 	result, err := service.BanchApiRepo(ctx, uuid, in, shortBase)
 	return result, err
 }

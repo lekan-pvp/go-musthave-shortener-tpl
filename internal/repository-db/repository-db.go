@@ -4,10 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/go-musthave-shortener-tpl/internal/config"
-	"github.com/go-musthave-shortener-tpl/internal/key_gen"
-	"github.com/go-musthave-shortener-tpl/internal/models"
 	"github.com/jackc/pgerrcode"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"log"
@@ -29,7 +29,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, PRIMARY KEY (id), UNIQUE (orig_url));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted PRIMARY KEY (id), UNIQUE (orig_url));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -55,16 +55,16 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 		return "", errors.New("you haven`t open the database connection")
 	}
 
-	ctx2, cancel := context.WithTimeout(ctx, 1*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 	defer cancel()
 	var result string
 
 	log.Println("IN InsertUserRepo short url =", shortURL)
-	_, err := db.ExecContext(ctx2, `INSERT INTO users(user_id, short_url, orig_url) VALUES ($1, $2, $3);`, userID, shortURL, origURL)
+	_, err := db.ExecContext(ctx, `INSERT INTO users(user_id, short_url, orig_url) VALUES ($1, $2, $3);`, userID, shortURL, origURL)
 
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
-			notOk := db.QueryRowContext(ctx2, `SELECT short_url FROM users WHERE orig_url=$1;`, origURL).Scan(&result)
+			notOk := db.QueryRowContext(ctx, `SELECT short_url FROM users WHERE orig_url=$1;`, origURL).Scan(&result)
 			if notOk != nil {
 				return "", notOk
 			}
@@ -164,4 +164,3 @@ func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []model
 
 	return result, nil
 }
-

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/go-musthave-shortener-tpl/internal/test_helper"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/test_helper"
 	"net/http"
 	"net/http/httptest"
 	"testing"

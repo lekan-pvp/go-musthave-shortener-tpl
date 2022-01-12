@@ -1,6 +1,6 @@
 package main
 
-import "github.com/go-musthave-shortener-tpl/internal/server"
+import "github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/server"
 
 func main() {
 	server.Run()

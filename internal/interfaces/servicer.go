@@ -2,7 +2,7 @@ package interfaces
 
 import (
 	"context"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 )
 
 type Servicer interface {

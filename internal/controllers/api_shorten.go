@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
-	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/jackc/pgerrcode"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookie_handler"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
 	"github.com/lib/pq"
 	"io"
 	"log"
