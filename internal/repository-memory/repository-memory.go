@@ -67,7 +67,7 @@ func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]
 	return user, nil
 }
 
-func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (string, error) {
+func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, uuid string, short string) (string, error) {
 	log.Println("IN MEM: GetOrigByShortRepo")
 	s.mu.RLock()
 	defer s.mu.RUnlock()
