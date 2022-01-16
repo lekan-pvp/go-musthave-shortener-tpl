@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/jackc/pgerrcode"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
@@ -77,22 +76,9 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 	return shortURL, nil
 }
 
-type Result struct {
-	OrigURL    string
-	DeleteFlag string
-}
-
-type ErrItemGone struct {
-	Err error
-}
-
-func (ig *ErrItemGone) Error() string {
-	return fmt.Sprintf("url is gone: %v", ig.Err)
-}
-
-func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, uuid string, shortURL string) (string, error) {
+func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error) {
 	log.Println("IN DB:")
-	var result *Result
+	var result string
 	if s.DB == nil {
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
@@ -105,20 +91,14 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, uuid string, shor
 
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
-	err := db.QueryRowContext(ctx2, `SELECT orig_url, delete_flag FROM users WHERE user_id=$1 AND short_url=$2;`, uuid, shortURL).Scan(&result.OrigURL, &result.DeleteFlag)
+	err := db.QueryRowContext(ctx2, `SELECT orig_url FROM users WHERE short_url=$2 AND delete_flag != "d";`, shortURL).Scan(&result)
 	if err != nil {
 		return "", err
 	}
 
-	var ErrURLIsGone *ErrItemGone
-
-	if result.DeleteFlag == "d" {
-		return "", fmt.Errorf("%w", ErrURLIsGone)
-	}
-
 	log.Println("ORIG URL=", result)
 
-	return result.OrigURL, nil
+	return result, nil
 }
 
 func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error) {

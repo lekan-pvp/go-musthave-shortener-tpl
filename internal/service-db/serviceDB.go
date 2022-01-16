@@ -18,8 +18,8 @@ func (service *Service) InsertUser(ctx context.Context, userID string, shortURL 
 	return short, nil
 }
 
-func (service *Service) GetOrigByShort(ctx context.Context, uuid string, shortURL string) (string, error) {
-	result, err := service.GetOrigByShortRepo(ctx, uuid, shortURL)
+func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (string, error) {
+	result, err := service.GetOrigByShortRepo(ctx, shortURL)
 	if err != nil {
 		return "", err
 	}
