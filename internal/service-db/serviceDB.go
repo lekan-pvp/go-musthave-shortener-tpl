@@ -49,3 +49,11 @@ func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.B
 	}
 	return result, nil
 }
+
+func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBases []string) error {
+	err := service.UpdateURLsRepo(ctx, uuid, shortBases)
+	if err != nil {
+		return err
+	}
+	return nil
+}

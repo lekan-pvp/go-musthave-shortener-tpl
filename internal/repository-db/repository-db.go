@@ -11,6 +11,7 @@ import (
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -29,7 +30,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, PRIMARY KEY (id), UNIQUE (orig_url));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, delete_flag VARCHAR, PRIMARY KEY (id), UNIQUE (orig_url));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -163,4 +164,80 @@ func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []model
 	}
 
 	return result, nil
+}
+
+func fanIn(inputChs ...chan string) chan string {
+	outCh := make(chan string)
+	go func() {
+		wg := &sync.WaitGroup{}
+
+		for _, inputCh := range inputChs {
+			wg.Add(1)
+			go func(inputCh chan string) {
+				defer wg.Done()
+				for item := range inputCh {
+					outCh <- item
+				}
+			}(inputCh)
+		}
+		wg.Wait()
+		close(outCh)
+	}()
+	return outCh
+}
+
+func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
+	db := s.DB
+	if db == nil {
+		return errors.New("You haven`t opened the database connection")
+	}
+
+	n := len(shortBases)
+
+	buffer := make([]string, n)
+
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	if len(shortBases) == 0 {
+		return errors.New("the list of URLs is empty")
+	}
+
+	inputChs := make([]chan string, 0, n)
+
+	go func() {
+		for _, item := range shortBases {
+			itemsCh := make(chan string)
+			itemsCh <- item
+			inputChs = append(inputChs, itemsCh)
+		}
+
+	}()
+
+	for item := range fanIn(inputChs...) {
+		buffer = append(buffer, item)
+	}
+
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET delete_flag="d" WHERE user_id=$1 AND short_url=$2`)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range buffer {
+		if _, err = stmt.ExecContext(ctx, uuid, v); err != nil {
+			if err = tx.Rollback(); err != nil {
+				return err
+			}
+			return err
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return err
+	}
+
+	buffer = buffer[:0]
+	return nil
 }

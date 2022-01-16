@@ -11,4 +11,5 @@ type Servicer interface {
 	GetList(ctx context.Context, uuid string) ([]models.URLs, error)
 	CheckPing(ctx context.Context) error
 	BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
+	UpdateURLs(ctx context.Context, uuid string, shortBase []string) error
 }
