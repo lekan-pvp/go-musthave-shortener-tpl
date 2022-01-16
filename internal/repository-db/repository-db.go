@@ -79,6 +79,7 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error) {
 	log.Println("IN DB:")
 	var result string
+	var deleted string
 	if s.DB == nil {
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
@@ -91,9 +92,13 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
-	err := db.QueryRowContext(ctx2, `SELECT orig_url FROM users WHERE short_url=$2 AND delete_flag != "d";`, shortURL).Scan(&result)
+	err := db.QueryRowContext(ctx2, `SELECT orig_url, delete_flag FROM users WHERE short_url=$2 AND delete_flag != "deleted";`, shortURL).Scan(&result, &deleted)
 	if err != nil {
 		return "", err
+	}
+
+	if deleted == "deleted" {
+		return deleted, nil
 	}
 
 	log.Println("ORIG URL=", result)
@@ -220,7 +225,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		buffer = append(buffer, item)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET delete_flag="d" WHERE user_id=$1 AND short_url=$2`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET delete_flag="deleted" WHERE user_id=$1 AND short_url=$2`)
 	if err != nil {
 		return err
 	}
