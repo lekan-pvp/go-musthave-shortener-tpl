@@ -11,8 +11,7 @@ import (
 
 func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var uuid string
-	in := make([]string, 0)
-
+	var in []string
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookie_handler.CheckCookie(cookie) {
 		cookie = cookie_handler.CreateCookie()
@@ -36,7 +35,7 @@ func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	err = json.Unmarshal(body, &in)
-	log.Println(in)
+	log.Printf("%q\n", in)
 	if err != nil {
 		log.Println("decoding json error...")
 		http.Error(w, err.Error(), 500)
