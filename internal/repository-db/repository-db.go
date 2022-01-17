@@ -197,6 +197,10 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		return errors.New("You haven`t opened the database connection")
 	}
 
+	if len(shortBases) == 0 {
+		return errors.New("request is empty...")
+	}
+
 	n := len(shortBases)
 
 	buffer := make([]string, n)
