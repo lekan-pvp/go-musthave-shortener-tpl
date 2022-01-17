@@ -36,7 +36,9 @@ func Run() {
 		r.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.APIShorten)
 		r.Post("/batch", controller.ApiShortenBatch)
 	})
-	router.Delete("/api/user/urls", controller.UpdateHandler)
+	router.Route("/api/user", func(r chi.Router) {
+		r.Delete("/urls", controller.UpdateHandler)
+	})
 
 	log.Println("creating router...")
 	log.Println("start application")
