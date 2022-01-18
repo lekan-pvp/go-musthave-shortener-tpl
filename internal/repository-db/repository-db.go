@@ -99,7 +99,7 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 
 	log.Printf("result=%s, deleted=%s", result, deleted)
 
-	if deleted == "deleted" {
+	if deleted == "d" {
 		return deleted, nil
 	}
 
@@ -231,7 +231,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		buffer = append(buffer, item)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET "delete_flag" = 'deleted' WHERE "user_id"=$1 AND "short_url"=$2`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET "delete_flag" = 'd' WHERE "user_id"=$1 AND "short_url"=$2`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err
