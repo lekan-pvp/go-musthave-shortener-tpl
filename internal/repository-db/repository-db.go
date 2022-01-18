@@ -205,8 +205,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	n := len(shortBases)
 
-	buffer := make([]string, n)
-
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -227,18 +225,14 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	}()
 
-	for item := range fanIn(inputChs...) {
-		buffer = append(buffer, item)
-	}
-
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=$1 WHERE user_id=$2 AND short_url=$3`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err
 	}
 
-	for _, v := range buffer {
-		if _, err = stmt.ExecContext(ctx, "deleted", uuid, v); err != nil {
+	for item := range fanIn(inputChs...) {
+		if _, err = stmt.ExecContext(ctx, "deleted", uuid, item); err != nil {
 			if err = tx.Rollback(); err != nil {
 				log.Println("Rollback error...")
 				return err
@@ -246,14 +240,12 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 			log.Println("ExecContext error...")
 			return err
 		}
-
 	}
+
 	if err = tx.Commit(); err != nil {
 		log.Println("Commit error...")
 		return err
 	}
 
-
-	buffer = buffer[:0]
 	return nil
 }
