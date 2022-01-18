@@ -30,7 +30,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted VARCHAR(10) DEFAULT "", PRIMARY KEY (id), UNIQUE (orig_url));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted VARCHAR(10) DEFAULT '', PRIMARY KEY (id), UNIQUE (orig_url));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -100,7 +100,7 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 	log.Printf("result=%s, deleted=%s", result, deleted)
 
 	if deleted == "deleted" {
-		return "deleted", nil
+		result = deleted
 	}
 
 	log.Println("ORIG URL=", result)
