@@ -214,14 +214,18 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	inputChs := make([]chan string, 0, n)
 
+	wg := sync.WaitGroup{}
+
+	wg.Add(1)
 	go func() {
 		for _, item := range shortBases {
 			itemsCh := make(chan string)
 			itemsCh <- item
 			inputChs = append(inputChs, itemsCh)
 		}
-
+		wg.Done()
 	}()
+	wg.Wait()
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
 	if err != nil {
