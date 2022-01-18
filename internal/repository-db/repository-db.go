@@ -30,7 +30,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, delete_flag VARCHAR DEFAULT '', PRIMARY KEY (id), UNIQUE (orig_url));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted BOOLEAN DEFAULT FALSE, PRIMARY KEY (id), UNIQUE (orig_url));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -79,7 +79,7 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error) {
 	log.Println("IN DB:")
 	var result string
-	var deleted string
+	var deleted bool
 	if s.DB == nil {
 		log.Println("You haven`t open the database connection")
 		return "", errors.New("you haven`t open the database connection")
@@ -97,10 +97,10 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 		return "", err
 	}
 
-	log.Printf("result=%s, deleted=%s", result, deleted)
+	log.Printf("result=%s, deleted=%t", result, deleted)
 
-	if deleted == "d" {
-		return deleted, nil
+	if deleted {
+		return "deleted", nil
 	}
 
 	log.Println("ORIG URL=", result)
@@ -231,7 +231,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		buffer = append(buffer, item)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET "delete_flag" = 'd' WHERE "user_id"=$1 AND "short_url"=$2`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET "is_deleted" = TRUE WHERE "user_id"=$1 AND "short_url"=$2`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err

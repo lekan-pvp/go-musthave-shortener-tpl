@@ -34,7 +34,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Location", orig)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
-	if orig == "d" {
+	if orig == "deleted" {
 		w.WriteHeader(410)
 	}
 
