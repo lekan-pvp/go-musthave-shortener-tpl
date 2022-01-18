@@ -246,12 +246,12 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 			log.Println("ExecContext error...")
 			return err
 		}
-		if err = tx.Commit(); err != nil {
-			log.Println("Commit error...")
-			return err
-		}
-	}
 
+	}
+	if err = tx.Commit(); err != nil {
+		log.Println("Commit error...")
+		return err
+	}
 
 
 	buffer = buffer[:0]
