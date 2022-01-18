@@ -92,7 +92,7 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
-	err := db.QueryRowContext(ctx2, `SELECT orig_url, delete_flag FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
+	err := db.QueryRowContext(ctx2, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
 	if err != nil {
 		return "", err
 	}
