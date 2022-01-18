@@ -219,9 +219,14 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	wg.Add(1)
 	go func() {
 		for _, item := range shortBases {
-			itemsCh := make(chan string)
-			itemsCh <- item
-			inputChs = append(inputChs, itemsCh)
+			wg.Add(1)
+			go func(item string) {
+				itemsCh := make(chan string)
+				itemsCh <- item
+				inputChs = append(inputChs, itemsCh)
+				wg.Done()
+			}(item)
+			wg.Wait()
 		}
 		wg.Done()
 	}()
