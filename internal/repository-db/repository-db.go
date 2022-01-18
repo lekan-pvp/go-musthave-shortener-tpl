@@ -230,7 +230,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	}
 
 	for item := range fanIn(inputChs...) {
-		log.Println("UUID=%s, SHORTURL=%s", uuid, item)
 		if _, err = stmt.ExecContext(ctx, "deleted", uuid, item); err != nil {
 			if err = tx.Rollback(); err != nil {
 				log.Println("Rollback error...")
