@@ -231,14 +231,14 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		buffer = append(buffer, item)
 	}
 
-	//stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=TRUE WHERE user_id=$1 AND short_url=$2;`)
-	//if err != nil {
-	//	log.Println("PrepareContext error...")
-	//	return err
-	//}
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=TRUE WHERE user_id=$1 AND short_url=$2;`)
+	if err != nil {
+		log.Println("PrepareContext error...")
+		return err
+	}
 
 	for _, v := range buffer {
-		if _, err = tx.ExecContext(ctx, `UPDATE users SET is_deleted=$1 WHERE user_id=$2 AND short_url=$3`, "TRUE", uuid, v); err != nil {
+		if _, err = stmt.ExecContext(ctx, `UPDATE users SET is_deleted=TRUE WHERE user_id=$1 AND short_url=$2`, uuid, v); err != nil {
 			if err = tx.Rollback(); err != nil {
 				log.Println("Rollback error...")
 				return err
