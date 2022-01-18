@@ -231,7 +231,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		buffer = append(buffer, item)
 	}
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET is_deleted=true WHERE "user_id"=$1 AND "short_url"=$2;`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE "users" SET is_deleted='t' WHERE "user_id"=$1 AND "short_url"=$2;`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err
