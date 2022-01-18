@@ -192,7 +192,7 @@ func fanIn(inputChs ...chan string) chan string {
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
-	log.Printf("UUID=$s, shorts=%q", uuid, shortBases)
+	log.Printf("UUID=%s, shorts=%q", uuid, shortBases)
 	db := s.DB
 	if db == nil {
 		return errors.New("You haven`t opened the database connection")
@@ -224,22 +224,23 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	}()
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=$1 WHERE short_url=$2`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE short_url=$2`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err
 	}
 
-	for item := range fanIn(inputChs...) {
-		if _, err = stmt.ExecContext(ctx, "deleted", item); err != nil {
-			if err = tx.Rollback(); err != nil {
-				log.Println("Rollback error...")
+		for item := range fanIn(inputChs...) {
+			if _, err = stmt.ExecContext(ctx, item); err != nil {
+				if err = tx.Rollback(); err != nil {
+					log.Println("Rollback error...")
+					return err
+				}
+				log.Println("ExecContext error...")
 				return err
 			}
-			log.Println("ExecContext error...")
-			return err
 		}
-	}
+
 
 	if err = tx.Commit(); err != nil {
 		log.Println("Commit error...")
