@@ -7,7 +7,6 @@ import (
 )
 
 func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
-	log.Printf("IN GetURLByID controller is %T", controller)
 	short := chi.URLParam(r, "articleID")
 	if short == "" {
 		http.Error(w, "url is empty", 404)
@@ -17,8 +16,6 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 	log.Println(short)
 
 	orig, err := controller.GetOrigByShort(r.Context(), short)
-	log.Println("error:", err)
-	log.Println("ORIG:", orig)
 	if err != nil {
 		log.Println("IN ERR HANDLER GetOrigByShort")
 		http.Error(w, err.Error(), 404)

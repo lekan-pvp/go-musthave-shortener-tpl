@@ -192,6 +192,7 @@ func fanIn(inputChs ...chan string) chan string {
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
+	log.Println("UUID=$s, shorts=%q", uuid, shortBases)
 	db := s.DB
 	if db == nil {
 		return errors.New("You haven`t opened the database connection")

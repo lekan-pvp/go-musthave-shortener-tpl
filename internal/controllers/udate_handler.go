@@ -35,7 +35,6 @@ func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	err = json.Unmarshal(body, &in)
-	log.Printf("%q\n", in)
 	if err != nil {
 		log.Println("decoding json error...")
 		http.Error(w, err.Error(), 500)
