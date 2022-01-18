@@ -97,6 +97,8 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 		return "", err
 	}
 
+	log.Printf("result=%s, deleted=%s", result, deleted)
+
 	if deleted == "deleted" {
 		return deleted, nil
 	}
