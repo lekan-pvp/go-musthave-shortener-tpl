@@ -218,16 +218,16 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	wg.Add(1)
 	go func() {
+		wg.Add(n)
 		for _, item := range shortBases {
-			wg.Add(1)
 			go func(item string) {
-				itemsCh := make(chan string)
+				itemsCh := make(chan string, 1)
 				itemsCh <- item
 				inputChs = append(inputChs, itemsCh)
 				wg.Done()
 			}(item)
-			wg.Wait()
 		}
+		wg.Wait()
 		wg.Done()
 	}()
 	wg.Wait()
@@ -238,18 +238,17 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		return err
 	}
 
-		for item := range fanIn(inputChs...) {
-			log.Printf("%s", item)
-			if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
-				if err = tx.Rollback(); err != nil {
-					log.Println("Rollback error...")
-					return err
-				}
-				log.Println("ExecContext error...")
+	for item := range fanIn(inputChs...) {
+		log.Printf("%s", item)
+		if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
+			if err = tx.Rollback(); err != nil {
+				log.Println("Rollback error...")
 				return err
 			}
+			log.Println("ExecContext error...")
+			return err
 		}
-
+	}
 
 	if err = tx.Commit(); err != nil {
 		log.Println("Commit error...")
