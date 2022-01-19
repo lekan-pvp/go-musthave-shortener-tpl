@@ -128,5 +128,5 @@ func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, uuid string, shor
 }
 
 func (s *MemoryRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-	return
+	errCh <- nil
 }

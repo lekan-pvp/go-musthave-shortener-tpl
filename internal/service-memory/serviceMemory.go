@@ -42,5 +42,5 @@ func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBase [
 }
 
 func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-	return
+	errCh <- nil
 }
