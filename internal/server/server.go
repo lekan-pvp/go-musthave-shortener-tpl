@@ -37,7 +37,7 @@ func Run() {
 		r.Post("/batch", controller.ApiShortenBatch)
 	})
 	router.Route("/api/user", func(r chi.Router) {
-		r.Delete("/urls", controller.UpdateHandler)
+		r.Delete("/urls", controller.DeleteHandler)
 	})
 
 	log.Println("creating router...")

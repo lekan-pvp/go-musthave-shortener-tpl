@@ -237,3 +237,24 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	return nil
 }
+
+func (s *DBRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+	var defErr error
+	defer func() {
+		if defErr != nil {
+			select {
+			case errCh <- defErr:
+			case <-ctx.Done():
+				log.Println("aborting...", short)
+			}
+		}
+		wg.Done()
+	}()
+
+	_, err := s.DB.ExecContext(ctx,`UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`, uuid, short)
+	if err != nil {
+		defErr = err
+		return
+	}
+
+}
