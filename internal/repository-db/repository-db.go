@@ -285,8 +285,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	}
 
 	for item := range fanIn(workerChs...) {
-		log.Println(item)
-		log.Printf("%s", item)
 		if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
 			if err = tx.Rollback(); err != nil {
 				log.Println("Rollback error...")
