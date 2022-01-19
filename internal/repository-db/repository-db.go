@@ -238,24 +238,43 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	return nil
 }
 
-func (s *DBRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-	var defErr error
-	defer func() {
-		if defErr != nil {
-			select {
-			case errCh <- defErr:
-			case <-ctx.Done():
-				log.Println("aborting...", short)
-			}
-		}
-		wg.Done()
-	}()
+//func (s *DBRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+//	var defErr error
+//	defer func() {
+//		if defErr != nil {
+//			select {
+//			case errCh <- defErr:
+//			case <-ctx.Done():
+//				log.Println("aborting...", short)
+//			}
+//		}
+//		wg.Done()
+//	}()
+//
+//	log.Printf("user_id=%s, short=%s", uuid, short)
+//	_, err := s.DB.ExecContext(ctx,`UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`, uuid, short)
+//	if err != nil {
+//		defErr = err
+//		return
+//	}
+//
+//}
 
-	log.Printf("user_id=%s, short=%s", uuid, short)
-	_, err := s.DB.ExecContext(ctx,`UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`, uuid, short)
-	if err != nil {
-		defErr = err
-		return
+
+func (s *DBRepository) DeleteItemRepo(ctx context.Context, short string) error{
+	db := s.DB
+
+	if db == nil {
+		log.Println("You haven`t open the database connection")
+		return errors.New("you haven`t open the database connection")
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+
+	_, err := db.ExecContext(ctx, `DELETE FROM users WHERE short_url=$1`, short)
+	if err != nil {
+		return err
+	}
+	return nil
 }

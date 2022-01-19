@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
-	"sync"
 )
 
 type Service struct {
@@ -41,6 +40,10 @@ func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBase [
 	return err
 }
 
-func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-	errCh <- nil
+//func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+//	errCh <- nil
+//}
+
+func (service *Service) DeleteItem(ctx context.Context, short string) error {
+	return nil
 }

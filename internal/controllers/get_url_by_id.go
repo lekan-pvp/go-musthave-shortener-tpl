@@ -38,7 +38,10 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 	if orig == "deleted" {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(410)
+		if err = controller.DeleteItem(r.Context(), short); err != nil {
+			http.Error(w, err.Error(), 404)
+			return
+		}
 		return
 	}
-
 }

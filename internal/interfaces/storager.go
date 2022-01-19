@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
-	"sync"
 )
 
 type Storager interface {
@@ -15,5 +14,6 @@ type Storager interface {
 	CheckPingRepo(ctx context.Context) error
 	BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 	UpdateURLsRepo(ctx context.Context, uuid string, shortURLs []string) error
-	DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
+	//DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
+	DeleteItemRepo(ctx context.Context, short string) error
 }

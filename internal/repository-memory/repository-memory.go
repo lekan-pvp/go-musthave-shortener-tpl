@@ -127,6 +127,10 @@ func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, uuid string, shor
 	return nil
 }
 
-func (s *MemoryRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-	errCh <- nil
+//func (s *MemoryRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+//	errCh <- nil
+//}
+
+func (s *MemoryRepository) DeleteItemRepo(ctx context.Context, short string) error {
+	return nil
 }

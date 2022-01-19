@@ -3,7 +3,6 @@ package interfaces
 import (
 	"context"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
-	"sync"
 )
 
 type Servicer interface {
@@ -13,5 +12,6 @@ type Servicer interface {
 	CheckPing(ctx context.Context) error
 	BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 	UpdateURLs(ctx context.Context, uuid string, shortBase []string) error
-	DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
+	//DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
+	DeleteItem(ctx context.Context, short string) error
 }
