@@ -191,7 +191,7 @@ func fanIn(inputChs ...chan string) chan string {
 	return outCh
 }
 
-func fanOut2(input []string, n int) []chan string {
+func fanOut(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
 	for i := 0; i < n; i++ {
 		ch := make(chan string)
@@ -217,43 +217,8 @@ func fanOut2(input []string, n int) []chan string {
 	return chs
 }
 
-//func fanOut(inputCh chan string, n int) []chan string {
-//	chs := make([]chan string, 0, n)
-//	for i := 0; i < n; i++ {
-//		ch := make(chan string)
-//		chs = append(chs, ch)
-//	}
-//
-//	go func() {
-//		defer func(chs []chan string) {
-//			for _, ch := range chs {
-//				close(ch)
-//			}
-//		}(chs)
-//
-//		for i := 0; ; i++ {
-//			if i == len(chs) {
-//				i = 0
-//			}
-//
-//			val, ok := <-inputCh
-//			if !ok {
-//				return
-//			}
-//
-//			ch := chs[i]
-//			ch <- val
-//		}
-//	}()
-//
-//	return chs
-//}
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
-	if len(shortBases) == 0 {
-		return errors.New("request is empty...")
-	}
-
 	n := len(shortBases)
 
 	tx, err := s.DB.Begin()
@@ -265,16 +230,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		return errors.New("the list of URLs is empty")
 	}
 
-	//inputCh := make(chan string)
-
-	//go func() {
-	//	for _, v := range shortBases {
-	//		inputCh <- v
-	//	}
-	//	close(inputCh)
-	//}()
-
-	fanOutChs := fanOut2(shortBases, n)
+	fanOutChs := fanOut(shortBases, n)
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
 	if err != nil {
