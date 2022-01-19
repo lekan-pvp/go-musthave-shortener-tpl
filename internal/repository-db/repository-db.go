@@ -194,7 +194,7 @@ func fanIn(inputChs ...chan string) chan string {
 func fanOut2(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
 	for _, val := range input{
-		ch := make(chan string)
+		ch := make(chan string, 1)
 		ch <- val
 		chs = append(chs, ch)
 	}
