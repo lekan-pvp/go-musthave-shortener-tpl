@@ -251,10 +251,10 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	n := len(shortBases)
 
-	//tx, err := db.Begin()
-	//if err != nil {
-	//	return err
-	//}
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
 
 	if len(shortBases) == 0 {
 		return errors.New("the list of URLs is empty")
@@ -278,29 +278,29 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	}
 
 
-	//stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
-	//if err != nil {
-	//	log.Println("PrepareContext error...")
-	//	return err
-	//}
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
+	if err != nil {
+		log.Println("PrepareContext error...")
+		return err
+	}
 
 	for item := range fanIn(workerChs...) {
 		log.Println(item)
-		//log.Printf("%s", item)
-		//if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
-		//	if err = tx.Rollback(); err != nil {
-		//		log.Println("Rollback error...")
-		//		return err
-		//	}
-		//	log.Println("ExecContext error...")
-		//	return err
-		//}
+		log.Printf("%s", item)
+		if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
+			if err = tx.Rollback(); err != nil {
+				log.Println("Rollback error...")
+				return err
+			}
+			log.Println("ExecContext error...")
+			return err
+		}
 	}
 
-	//if err = tx.Commit(); err != nil {
-	//	log.Println("Commit error...")
-	//	return err
-	//}
+	if err = tx.Commit(); err != nil {
+		log.Println("Commit error...")
+		return err
+	}
 
 	log.Println("DB is UPDATED")
 
