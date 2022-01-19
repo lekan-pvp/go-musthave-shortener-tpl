@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
+	"log"
+	"sync"
 )
 
 type Service struct {
@@ -38,4 +40,19 @@ func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.B
 func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBase []string) error {
 	err := service.UpdateURLsRepo(ctx, uuid, shortBase)
 	return err
+}
+
+func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+	var defErr error
+	defer func() {
+		if defErr != nil {
+			select {
+			case errCh <- defErr:
+			case <-ctx.Done():
+				log.Println("aborting...", short)
+			}
+		}
+		wg.Done()
+	}()
+	service.DeleteURLsRepo(ctx, uuid, short, errCh, wg)
 }

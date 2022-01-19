@@ -126,3 +126,7 @@ func (s *MemoryRepository) BanchApiRepo(ctx context.Context, uuid string, in []m
 func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortURLs []string) error {
 	return nil
 }
+
+func (s *MemoryRepository) DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
+
+}
