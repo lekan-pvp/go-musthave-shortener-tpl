@@ -224,10 +224,6 @@ func fanOut(inputCh chan string, n int) []chan string {
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
-	db := s.DB
-	if db == nil {
-		return errors.New("You haven`t opened the database connection")
-	}
 
 	if len(shortBases) == 0 {
 		return errors.New("request is empty...")
@@ -235,7 +231,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	n := len(shortBases)
 
-	tx, err := db.Begin()
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return err
 	}
@@ -257,7 +253,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
 	if err != nil {
-		log.Println("PrepareContext error...")
 		return err
 	}
 	defer stmt.Close()
@@ -265,16 +260,13 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	for item := range fanIn(fanOutChs...) {
 		if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
 			if err = tx.Rollback(); err != nil {
-				log.Println("Rollback error...")
 				return err
 			}
-			log.Println("ExecContext error...")
 			return err
 		}
 	}
 
 	if err = tx.Commit(); err != nil {
-		log.Println("Commit error...")
 		return err
 	}
 
