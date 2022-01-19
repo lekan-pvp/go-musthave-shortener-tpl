@@ -251,6 +251,7 @@ func (s *DBRepository) DeleteURLsRepo(ctx context.Context, uuid string, short st
 		wg.Done()
 	}()
 
+	log.Printf("user_id=%s, short=%s", uuid, short)
 	_, err := s.DB.ExecContext(ctx,`UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`, uuid, short)
 	if err != nil {
 		defErr = err

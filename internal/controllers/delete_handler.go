@@ -64,11 +64,5 @@ func (controller *Controller) DeleteHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	//err = controller.UpdateURLs(r.Context(), uuid, in)
-	//if err != nil {
-	//	log.Println("update db error")
-	//	http.Error(w, err.Error(), 500)
-	//	return
-	//}
 	w.WriteHeader(202)
 }
