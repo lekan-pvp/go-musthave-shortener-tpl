@@ -193,19 +193,20 @@ func fanIn(inputChs ...chan string) chan string {
 
 func fanOut2(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
-	for _, val := range input{
+	for i, val := range input{
 		ch := make(chan string, 1)
 		ch <- val
 		chs = append(chs, ch)
+		close(chs[i])
 	}
 
-	go func() {
-		defer func(chs []chan string) {
-			for _, ch := range chs {
-				close(ch)
-			}
-		}(chs)
-	}()
+	//go func() {
+	//	defer func(chs []chan string) {
+	//		for _, ch := range chs {
+	//			close(ch)
+	//		}
+	//	}(chs)
+	//}()
 
 	return chs
 }
