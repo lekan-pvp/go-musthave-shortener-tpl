@@ -266,6 +266,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		for _, v := range shortBases {
 			inputCh <- v
 		}
+		close(inputCh)
 	}()
 
 	fanOutChs := fanOut(inputCh, n)
