@@ -223,22 +223,6 @@ func fanOut(inputCh chan string, n int) []chan string {
 	return chs
 }
 
-//func newWorker(inputCh <-chan string) chan string {
-//	outCh := make(chan string)
-//
-//	go func() {
-//		for val := range inputCh {
-//			outCh <- val
-//		}
-//
-//		close(outCh)
-//	}()
-//
-//	return outCh
-//}
-
-
-
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
 	db := s.DB
 	if db == nil {
@@ -270,19 +254,13 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	}()
 
 	fanOutChs := fanOut(inputCh, n)
-	//workerChs := make([]chan string, 0, n)
-
-	//for _, fanOutCh := range fanOutChs {
-	//	w := newWorker(fanOutCh)
-	//	workerChs = append(workerChs, w)
-	//}
-
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
 	if err != nil {
 		log.Println("PrepareContext error...")
 		return err
 	}
+	defer stmt.Close()
 
 	for item := range fanIn(fanOutChs...) {
 		if _, err = stmt.ExecContext(ctx, uuid, item); err != nil {
@@ -299,8 +277,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 		log.Println("Commit error...")
 		return err
 	}
-
-	log.Println("DB is UPDATED")
 
 	return nil
 }
