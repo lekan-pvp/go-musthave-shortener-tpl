@@ -32,7 +32,9 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 
 	if orig == "deleted" {
+		log.Printf("orig = %s", orig)
 		w.WriteHeader(410)
+		return
 	}
 
 	log.Printf("In get_url_by_id: %s\n", orig)
