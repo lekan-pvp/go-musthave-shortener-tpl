@@ -193,7 +193,7 @@ func fanIn(inputChs ...chan string) chan string {
 
 func fanOut(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
-	for i, val := range input{
+	for i, val := range input {
 		ch := make(chan string, 1)
 		ch <- val
 		chs = append(chs, ch)
@@ -216,7 +216,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 
 	fanOutChs := fanOut(shortBases, n)
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE user_id=$1 AND short_url=$2`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE short_url=$2`)
 	if err != nil {
 		return err
 	}
@@ -260,8 +260,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 //
 //}
 
-
-func (s *DBRepository) DeleteItemRepo(ctx context.Context, short string) error{
+func (s *DBRepository) DeleteItemRepo(ctx context.Context, short string) error {
 	db := s.DB
 
 	if db == nil {
