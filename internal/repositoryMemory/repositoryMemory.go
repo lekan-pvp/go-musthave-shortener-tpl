@@ -1,4 +1,4 @@
-package repository_memory
+package repositoryMemory
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keyGen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	_ "github.com/lib/pq"
 	"io"
@@ -112,11 +112,11 @@ func (s *MemoryRepository) CheckPingRepo(ctx context.Context) error {
 	return nil
 }
 
-func (s *MemoryRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
-	log.Println("BanchApiRepo IN MEMORY:")
+func (s *MemoryRepository) BanchAPIRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	log.Println("BanchAPIRepo IN MEMORY:")
 	result := make([]models.BatchResult, 0)
 	for _, v := range in {
-		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		short := keyGen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
 		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
 		s.users = append(s.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: v.OriginalURL, CorrelationID: v.CorrelationID})
 	}

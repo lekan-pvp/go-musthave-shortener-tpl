@@ -11,6 +11,7 @@ import (
 func TestURLsController_AddURL(t *testing.T) {
 	r := chi.NewRouter()
 	r.Post("/", func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(201)
 		w.Write([]byte("http://localhost:8080/whTHc"))

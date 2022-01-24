@@ -3,7 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookie_handler"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieServer"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"log"
 	"net/http"
@@ -24,7 +24,7 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	var resultSlice = New()
 
 	cookie, err := r.Cookie("token")
-	if err != nil || !cookie_handler.CheckCookie(cookie) {
+	if err != nil || !cookieServer.CheckCookie(cookie) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(204)
 		return

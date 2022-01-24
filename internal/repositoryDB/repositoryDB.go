@@ -1,4 +1,4 @@
-package repository_db
+package repositoryDB
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/jackc/pgerrcode"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keyGen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -136,8 +136,8 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 	return user, nil
 }
 
-func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
-	log.Println("BanchApiRepo IN DB:")
+func (s *DBRepository) BanchAPIRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	log.Println("BanchAPIRepo IN DB:")
 	result := make([]models.BatchResult, 0)
 
 	tx, err := s.DB.Begin()
@@ -156,7 +156,7 @@ func (s *DBRepository) BanchApiRepo(ctx context.Context, uuid string, in []model
 	defer stmt.Close()
 
 	for _, v := range in {
-		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		short := keyGen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
 		if _, err = stmt.ExecContext(ctx, uuid, short, v.OriginalURL, v.CorrelationID); err != nil {
 			log.Println("error insert in db!")
 			return nil, err

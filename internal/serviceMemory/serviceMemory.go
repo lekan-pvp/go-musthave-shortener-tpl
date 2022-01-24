@@ -1,4 +1,4 @@
-package service_memory
+package serviceMemory
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func (service *Service) CheckPing(ctx context.Context) error {
 }
 
 func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
-	result, err := service.BanchApiRepo(ctx, uuid, in, shortBase)
+	result, err := service.BanchAPIRepo(ctx, uuid, in, shortBase)
 	return result, err
 }
 

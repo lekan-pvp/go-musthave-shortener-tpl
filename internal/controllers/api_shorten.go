@@ -3,8 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/jackc/pgerrcode"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookie_handler"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/key_gen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieServer"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keyGen"
 	"github.com/lib/pq"
 	"io"
 	"log"
@@ -17,7 +17,7 @@ type short struct {
 }
 
 type long struct {
-	Url string `json:"url"`
+	URL string `json:"url"`
 }
 
 func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +29,8 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	var err error
 
 	cookie, err = r.Cookie("token")
-	if err != nil || !cookie_handler.CheckCookie(cookie) {
-		cookie = cookie_handler.CreateCookie()
+	if err != nil || !cookieServer.CheckCookie(cookie) {
+		cookie = cookieServer.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)
@@ -54,8 +54,8 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 
 	status := http.StatusCreated
 
-	shortUrl := key_gen.GenerateShortLink(long.Url, uuid)
-	shortURL, err := controller.InsertUser(r.Context(), uuid, shortUrl, long.Url)
+	generatedShortURL := keyGen.GenerateShortLink(long.URL, uuid)
+	shortURL, err := controller.InsertUser(r.Context(), uuid, generatedShortURL, long.URL)
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 			status = http.StatusConflict

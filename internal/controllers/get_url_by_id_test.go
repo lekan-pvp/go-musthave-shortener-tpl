@@ -15,6 +15,7 @@ func TestURLsController_GetURLByID1(t *testing.T) {
 
 	r := chi.NewRouter()
 	r.Get("/{articleID}", func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
 		key := chi.URLParam(r, "articleID")
 		url := store[key]
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
