@@ -8,7 +8,7 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"log"
 	"sync"
 	"time"
