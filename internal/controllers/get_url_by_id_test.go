@@ -44,7 +44,9 @@ func TestURLsController_GetURLByID1(t *testing.T) {
 		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	if _, body := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil); string(body) != "http://google.com" {
+	res, body := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	defer res.Body.Close()
+	if string(body) != "http://google.com" {
 		t.Fatalf("want %s, got %s", "http://google.com", string(body))
 	}
 }

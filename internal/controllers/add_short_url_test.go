@@ -19,11 +19,13 @@ func TestURLsController_AddURL(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if _, body := testHelper.TestRequest(t, ts, "POST", "/", nil); string(body) != "http://localhost:8080/whTHc" {
+	res, body := testHelper.TestRequest(t, ts, "POST", "/", nil)
+	defer res.Body.Close()
+	if string(body) != "http://localhost:8080/whTHc" {
 		t.Fatalf("want %s, got %s", "http://localhost:8080/whTHc", string(body))
 	}
 
-	res, _ := testHelper.TestRequest(t, ts, "POST", "/", nil)
+	res, _ = testHelper.TestRequest(t, ts, "POST", "/", nil)
 	defer res.Body.Close()
 	if res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))

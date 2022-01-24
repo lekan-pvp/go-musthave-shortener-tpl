@@ -57,8 +57,8 @@ func TestURLsController_APIShorten(t *testing.T) {
 	}
 
 	bodytest := bodytest{}
-
-	_, body := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil)
+	res, body := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil)
+	defer res.Body.Close()
 
 	err := json.Unmarshal(body, &bodytest)
 	if err != nil {
