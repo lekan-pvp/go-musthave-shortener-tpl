@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 	var cookie *http.Cookie
 	var err error
@@ -41,7 +41,7 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 
 	status := http.StatusCreated
 	short := keygen.GenerateShortLink(orig, uuid)
-	short, err = controller.InsertUser(ctx, uuid, short, orig)
+	short, err = service.InsertUser(ctx, uuid, short, orig)
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 			status = http.StatusConflict
@@ -53,5 +53,5 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(status)
-	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
+	w.Write([]byte(service.Cfg.BaseURL + "/" + short))
 }

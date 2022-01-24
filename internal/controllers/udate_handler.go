@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 	var in []string
 	cookie, err := r.Cookie("token")
@@ -28,6 +28,7 @@ func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Reque
 	uuid = values[0]
 
 	body, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	if err != nil {
 		log.Println("reading body error...")
 		http.Error(w, err.Error(), 500)
@@ -41,7 +42,7 @@ func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = controller.UpdateURLs(r.Context(), uuid, in)
+	err = service.UpdateURLs(r.Context(), uuid, in)
 	if err != nil {
 		log.Println("update db error")
 		http.Error(w, err.Error(), 500)

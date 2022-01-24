@@ -20,7 +20,7 @@ type long struct {
 	URL string `json:"url"`
 }
 
-func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) APIShorten(w http.ResponseWriter, r *http.Request) {
 	short := short{}
 	long := long{}
 
@@ -55,7 +55,7 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	status := http.StatusCreated
 
 	generatedShortURL := keygen.GenerateShortLink(long.URL, uuid)
-	shortURL, err := controller.InsertUser(r.Context(), uuid, generatedShortURL, long.URL)
+	shortURL, err := service.InsertUser(r.Context(), uuid, generatedShortURL, long.URL)
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 			status = http.StatusConflict
@@ -66,7 +66,7 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	short.Key = controller.Cfg.BaseURL + "/" + shortURL
+	short.Key = service.Cfg.BaseURL + "/" + shortURL
 	result, err := json.Marshal(&short)
 	if err != nil {
 		http.Error(w, err.Error(), 500)

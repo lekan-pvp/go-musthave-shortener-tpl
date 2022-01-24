@@ -20,7 +20,7 @@ var out []models.URLs
 
 type ResultSlice []URLS
 
-func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request) {
 	var resultSlice = New()
 
 	cookie, err := r.Cookie("token")
@@ -38,13 +38,13 @@ func (controller *Controller) GetUserURLs(w http.ResponseWriter, r *http.Request
 	ctx, stop := context.WithTimeout(r.Context(), 1*time.Second)
 	defer stop()
 
-	out, err := controller.GetList(ctx, uuid)
+	out, err := service.GetList(ctx, uuid)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	resultSlice.Add(out, controller.Cfg.BaseURL)
+	resultSlice.Add(out, service.Cfg.BaseURL)
 
 	if resultSlice == nil {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

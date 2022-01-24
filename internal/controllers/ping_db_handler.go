@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func (controller *Controller) PingDBHandler(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) PingDBHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 250*time.Millisecond)
 	defer cancel()
 
-	err := controller.CheckPing(ctx)
+	err := service.CheckPing(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

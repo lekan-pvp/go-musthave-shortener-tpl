@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	short := chi.URLParam(r, "articleID")
 	if short == "" {
 		http.Error(w, "url is empty", 404)
@@ -15,7 +15,7 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 
 	log.Println(short)
 
-	orig, err := controller.GetOrigByShort(r.Context(), short)
+	orig, err := service.GetOrigByShort(r.Context(), short)
 	if err != nil {
 		log.Println("IN ERR HANDLER GetOrigByShort")
 		http.Error(w, err.Error(), 404)
@@ -34,11 +34,10 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-
 	if orig == "deleted" {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(410)
-		if err = controller.DeleteItem(r.Context(), short); err != nil {
+		if err = service.DeleteItem(r.Context(), short); err != nil {
 			http.Error(w, err.Error(), 404)
 			return
 		}

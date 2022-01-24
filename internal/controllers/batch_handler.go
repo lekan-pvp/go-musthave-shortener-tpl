@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (controller *Controller) APIShortenBatch(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) APIShortenBatch(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 
 	in := make([]models.BatchIn, 0)
@@ -37,7 +37,7 @@ func (controller *Controller) APIShortenBatch(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	result, err := controller.BanchAPI(r.Context(), uuid, in, controller.Cfg.BaseURL)
+	result, err := service.BanchAPI(r.Context(), uuid, in, service.Cfg.BaseURL)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
