@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/test_helper"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/testHelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -39,21 +39,21 @@ func TestURLsController_APIShorten(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.StatusCode != 201 {
+	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.StatusCode != 201 {
 		t.Fatalf("want %d, got %d\n", 201, res.StatusCode)
 	}
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.Header.Get("Content-Type") != "application/json; charset=utf-8" {
+	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.Header.Get("Content-Type") != "application/json; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/api/shorten/3", nil); res.StatusCode != 404 {
+	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten/3", nil); res.StatusCode != 404 {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 
 	bodytest := bodytest{}
 
-	_, body := test_helper.TestRequest(t, ts, "POST", "/api/shorten", nil)
+	_, body := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil)
 
 	err := json.Unmarshal(body, &bodytest)
 	if err != nil {

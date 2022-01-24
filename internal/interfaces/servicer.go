@@ -10,7 +10,7 @@ type Servicer interface {
 	GetOrigByShort(ctx context.Context, shortURL string) (string, error)
 	GetList(ctx context.Context, uuid string) ([]models.URLs, error)
 	CheckPing(ctx context.Context) error
-	BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
+	BanchAPI(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 	UpdateURLs(ctx context.Context, uuid string, shortBase []string) error
 	//DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
 	DeleteItem(ctx context.Context, short string) error

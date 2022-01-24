@@ -34,7 +34,7 @@ func Run() {
 	router.With(mware.GzipHandle).Get("/{articleID}", controller.GetURLByID)
 	router.Route("/api/shorten", func(r chi.Router) {
 		r.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.APIShorten)
-		r.Post("/batch", controller.ApiShortenBatch)
+		r.Post("/batch", controller.APIShortenBatch)
 	})
 	router.Route("/api/user", func(r chi.Router) {
 		r.Delete("/urls", controller.UpdateHandler)

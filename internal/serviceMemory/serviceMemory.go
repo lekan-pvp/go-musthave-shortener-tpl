@@ -30,7 +30,7 @@ func (service *Service) CheckPing(ctx context.Context) error {
 	return err
 }
 
-func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+func (service *Service) BanchAPI(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
 	result, err := service.BanchAPIRepo(ctx, uuid, in, shortBase)
 	return result, err
 }
