@@ -9,7 +9,7 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/mware"
 	repository_db "github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/repositorydb"
 	repository_memory "github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/repositorymemory"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/serviceMemory"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/servicememory"
 	"log"
 	"net/http"
 )
@@ -21,7 +21,7 @@ func Run() {
 
 	repo.New(cfg)
 
-	service := &serviceMemory.Service{Storager: repo}
+	service := &servicememory.Service{Storager: repo}
 	controller := controllers.Controller{Servicer: service, Cfg: cfg}
 
 	router := chi.NewRouter()

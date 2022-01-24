@@ -1,4 +1,4 @@
-package serviceMemory
+package servicememory
 
 import (
 	"context"
