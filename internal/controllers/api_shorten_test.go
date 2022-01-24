@@ -24,7 +24,6 @@ func TestURLsController_APIShorten(t *testing.T) {
 
 	r := chi.NewRouter()
 	r.Post("/api/shorten", func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
 		result, err := json.Marshal(&short)
@@ -39,15 +38,21 @@ func TestURLsController_APIShorten(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.StatusCode != 201 {
+	res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 201 {
 		t.Fatalf("want %d, got %d\n", 201, res.StatusCode)
 	}
 
-	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil); res.Header.Get("Content-Type") != "application/json; charset=utf-8" {
+	res, _ = testHelper.TestRequest(t, ts, "POST", "/api/shorten", nil)
+	defer res.Body.Close()
+	if res.Header.Get("Content-Type") != "application/json; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "application/json; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	if res, _ := testHelper.TestRequest(t, ts, "POST", "/api/shorten/3", nil); res.StatusCode != 404 {
+	res, _ = testHelper.TestRequest(t, ts, "POST", "/api/shorten/3", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 404 {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 

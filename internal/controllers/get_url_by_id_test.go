@@ -26,15 +26,21 @@ func TestURLsController_GetURLByID1(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if res, _ := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil); res.StatusCode != 307 {
+	res, _ := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 307 {
 		t.Fatalf("want %d, got %d", 307, res.StatusCode)
 	}
 
-	if res, _ := testHelper.TestRequest(t, ts, "GET", "/user/7", nil); res.StatusCode != 404 {
+	res, _ = testHelper.TestRequest(t, ts, "GET", "/user/7", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 404 {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 
-	if res, _ := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil); res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
+	res, _ = testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	defer res.Body.Close()
+	if res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
