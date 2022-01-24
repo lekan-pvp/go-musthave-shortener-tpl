@@ -1,4 +1,4 @@
-package repositoryMemory
+package repositorymemory
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"errors"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keyGen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	_ "github.com/lib/pq"
 	"io"
@@ -116,7 +116,7 @@ func (s *MemoryRepository) BanchAPIRepo(ctx context.Context, uuid string, in []m
 	log.Println("BanchAPIRepo IN MEMORY:")
 	result := make([]models.BatchResult, 0)
 	for _, v := range in {
-		short := keyGen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		short := keygen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
 		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
 		s.users = append(s.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: v.OriginalURL, CorrelationID: v.CorrelationID})
 	}

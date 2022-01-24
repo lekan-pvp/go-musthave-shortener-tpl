@@ -1,4 +1,4 @@
-package keyGen
+package keygen
 
 import (
 	"crypto/sha256"

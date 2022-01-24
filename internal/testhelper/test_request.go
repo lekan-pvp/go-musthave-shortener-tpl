@@ -1,4 +1,4 @@
-package testHelper
+package testhelper
 
 import (
 	"io"

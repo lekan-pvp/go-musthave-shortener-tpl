@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/testHelper"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/testhelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,25 +26,25 @@ func TestURLsController_GetURLByID1(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	res, _ := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	res, _ := testhelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
 	defer res.Body.Close()
 	if res.StatusCode != 307 {
 		t.Fatalf("want %d, got %d", 307, res.StatusCode)
 	}
 
-	res, _ = testHelper.TestRequest(t, ts, "GET", "/user/7", nil)
+	res, _ = testhelper.TestRequest(t, ts, "GET", "/user/7", nil)
 	defer res.Body.Close()
 	if res.StatusCode != 404 {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 
-	res, _ = testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	res, _ = testhelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
 	defer res.Body.Close()
 	if res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	res, body := testHelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
+	res, body := testhelper.TestRequest(t, ts, "GET", "/gbaiC", nil)
 	defer res.Body.Close()
 	if string(body) != "http://google.com" {
 		t.Fatalf("want %s, got %s", "http://google.com", string(body))

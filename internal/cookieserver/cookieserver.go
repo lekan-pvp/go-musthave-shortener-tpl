@@ -1,4 +1,4 @@
-package cookieServer
+package cookieserver
 
 import (
 	"crypto/hmac"

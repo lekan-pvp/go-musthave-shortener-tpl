@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieServer"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieserver"
 	"io"
 	"log"
 	"net/http"
@@ -13,8 +13,8 @@ func (controller *Controller) UpdateHandler(w http.ResponseWriter, r *http.Reque
 	var uuid string
 	var in []string
 	cookie, err := r.Cookie("token")
-	if err != nil || !cookieServer.CheckCookie(cookie) {
-		cookie = cookieServer.CreateCookie()
+	if err != nil || !cookieserver.CheckCookie(cookie) {
+		cookie = cookieserver.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)

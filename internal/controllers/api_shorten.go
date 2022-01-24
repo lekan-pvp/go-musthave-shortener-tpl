@@ -3,8 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/jackc/pgerrcode"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieServer"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keyGen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieserver"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lib/pq"
 	"io"
 	"log"
@@ -29,8 +29,8 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 	var err error
 
 	cookie, err = r.Cookie("token")
-	if err != nil || !cookieServer.CheckCookie(cookie) {
-		cookie = cookieServer.CreateCookie()
+	if err != nil || !cookieserver.CheckCookie(cookie) {
+		cookie = cookieserver.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)
@@ -54,7 +54,7 @@ func (controller *Controller) APIShorten(w http.ResponseWriter, r *http.Request)
 
 	status := http.StatusCreated
 
-	generatedShortURL := keyGen.GenerateShortLink(long.URL, uuid)
+	generatedShortURL := keygen.GenerateShortLink(long.URL, uuid)
 	shortURL, err := controller.InsertUser(r.Context(), uuid, generatedShortURL, long.URL)
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {

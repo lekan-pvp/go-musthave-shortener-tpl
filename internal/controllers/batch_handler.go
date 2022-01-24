@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieServer"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieserver"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"io"
 	"net/http"
@@ -15,8 +15,8 @@ func (controller *Controller) APIShortenBatch(w http.ResponseWriter, r *http.Req
 	in := make([]models.BatchIn, 0)
 
 	cookie, err := r.Cookie("token")
-	if err != nil || !cookieServer.CheckCookie(cookie) {
-		cookie = cookieServer.CreateCookie()
+	if err != nil || !cookieserver.CheckCookie(cookie) {
+		cookie = cookieserver.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)
