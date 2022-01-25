@@ -9,8 +9,8 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
+	"golang.org/x/sync/errgroup"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -170,25 +170,25 @@ func (s *DBRepository) BanchAPIRepo(ctx context.Context, uuid string, in []model
 	return result, nil
 }
 
-func fanIn(inputChs ...chan string) chan string {
-	outCh := make(chan string)
-	go func() {
-		wg := &sync.WaitGroup{}
-
-		for _, inputCh := range inputChs {
-			wg.Add(1)
-			go func(inputCh chan string) {
-				defer wg.Done()
-				for item := range inputCh {
-					outCh <- item
-				}
-			}(inputCh)
-		}
-		wg.Wait()
-		close(outCh)
-	}()
-	return outCh
-}
+//func fanIn(inputChs ...chan string) chan string {
+//	outCh := make(chan string)
+//	go func() {
+//		wg := &sync.WaitGroup{}
+//
+//		for _, inputCh := range inputChs {
+//			wg.Add(1)
+//			go func(inputCh chan string) {
+//				defer wg.Done()
+//				for item := range inputCh {
+//					outCh <- item
+//				}
+//			}(inputCh)
+//		}
+//		wg.Wait()
+//		close(outCh)
+//	}()
+//	return outCh
+//}
 
 func fanOut(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
@@ -201,8 +201,10 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBases []string) error {
+func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
 	n := len(shortBases)
+
+	g, _ := errgroup.WithContext(ctx)
 
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -221,13 +223,22 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, uuid string, shortBas
 	}
 	defer stmt.Close()
 
-	for item := range fanIn(fanOutChs...) {
-		if _, err = stmt.ExecContext(ctx, item); err != nil {
-			if err = tx.Rollback(); err != nil {
-				return err
+	for _, item := range fanOutChs {
+		g.Go(func() error {
+			for id := range item {
+				if _, err := stmt.ExecContext(ctx, id); err != nil {
+					if err = tx.Rollback(); err != nil {
+						return err
+					}
+					return err
+				}
 			}
-			return err
-		}
+			return nil
+		})
+	}
+
+	if err = g.Wait(); err != nil {
+		return err
 	}
 
 	if err = tx.Commit(); err != nil {
