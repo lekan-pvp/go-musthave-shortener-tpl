@@ -9,7 +9,6 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
-	"golang.org/x/sync/errgroup"
 	"log"
 	"time"
 )
@@ -201,10 +200,21 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string, errCh chan<- error) {
+	go func() {
+		for id := range inputCh {
+			if _, err := stmt.ExecContext(ctx, id); err != nil {
+				if err = tx.Rollback(); err != nil {
+					errCh <- err
+				}
+				errCh <- err
+			}
+		}
+	}()
+}
+
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
 	n := len(shortBases)
-
-	g, _ := errgroup.WithContext(ctx)
 
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -223,21 +233,14 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	defer stmt.Close()
 
+	errCh := make(chan error)
+
 	for _, item := range fanOutChs {
-		g.Go(func() error {
-			for id := range item {
-				if _, err := stmt.ExecContext(ctx, id); err != nil {
-					if err = tx.Rollback(); err != nil {
-						return err
-					}
-					return err
-				}
-			}
-			return nil
-		})
+		newWorker(ctx, stmt, tx, item, errCh)
 	}
 
-	if err = g.Wait(); err != nil {
+	err = <-errCh
+	if err != nil {
 		return err
 	}
 
