@@ -50,28 +50,13 @@ func (service *Service) BanchAPI(ctx context.Context, uuid string, in []models.B
 	return result, nil
 }
 
-func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBases []string) error {
-	err := service.UpdateURLsRepo(ctx, uuid, shortBases)
+func (service *Service) UpdateURLs(ctx context.Context, shortBases []string) error {
+	err := service.UpdateURLsRepo(ctx, shortBases)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-//func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-//	var defErr error
-//	defer func() {
-//		if defErr != nil {
-//			select {
-//			case errCh <- defErr:
-//			case <-ctx.Done():
-//				log.Println("aborting...", short)
-//			}
-//		}
-//		wg.Done()
-//	}()
-//	service.DeleteURLsRepo(ctx, uuid, short, errCh, wg)
-//}
 
 func (service *Service) DeleteItem(ctx context.Context, short string) error {
 	err := service.DeleteItemRepo(ctx, short)

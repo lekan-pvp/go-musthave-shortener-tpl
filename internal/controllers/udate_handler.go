@@ -10,7 +10,6 @@ import (
 )
 
 func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	var uuid string
 	var in []string
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookieserver.CheckCookie(cookie) {
@@ -25,7 +24,6 @@ func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	uuid = values[0]
 
 	body, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
@@ -42,7 +40,7 @@ func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = service.UpdateURLs(r.Context(), uuid, in)
+	err = service.UpdateURLs(r.Context(), in)
 	if err != nil {
 		log.Println("update db error")
 		http.Error(w, err.Error(), 500)

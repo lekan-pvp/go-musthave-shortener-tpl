@@ -35,14 +35,10 @@ func (service *Service) BanchAPI(ctx context.Context, uuid string, in []models.B
 	return result, err
 }
 
-func (service *Service) UpdateURLs(ctx context.Context, uuid string, shortBase []string) error {
-	err := service.UpdateURLsRepo(ctx, uuid, shortBase)
+func (service *Service) UpdateURLs(ctx context.Context, shortBase []string) error {
+	err := service.UpdateURLsRepo(ctx, shortBase)
 	return err
 }
-
-//func (service *Service) DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup) {
-//	errCh <- nil
-//}
 
 func (service *Service) DeleteItem(ctx context.Context, short string) error {
 	return nil

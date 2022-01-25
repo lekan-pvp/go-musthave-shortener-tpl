@@ -13,7 +13,7 @@ type Storager interface {
 	GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error)
 	CheckPingRepo(ctx context.Context) error
 	BanchAPIRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
-	UpdateURLsRepo(ctx context.Context, uuid string, shortURLs []string) error
+	UpdateURLsRepo(ctx context.Context, shortURLs []string) error
 	//DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
 	DeleteItemRepo(ctx context.Context, short string) error
 }
