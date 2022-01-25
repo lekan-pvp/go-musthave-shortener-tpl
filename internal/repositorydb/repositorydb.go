@@ -211,6 +211,7 @@ func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan s
 			}
 		}
 	}()
+	close(errCh)
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
