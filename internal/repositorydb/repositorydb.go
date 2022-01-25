@@ -200,18 +200,17 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string, errCh chan<- error) {
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string) {
 	go func() {
 		for id := range inputCh {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
-					errCh <- err
+					return
 				}
-				errCh <- err
+				return
 			}
 		}
 	}()
-	close(errCh)
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
@@ -234,15 +233,8 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	defer stmt.Close()
 
-	errCh := make(chan error)
-
 	for _, item := range fanOutChs {
-		newWorker(ctx, stmt, tx, item, errCh)
-	}
-
-	err = <-errCh
-	if err != nil {
-		return err
+		newWorker(ctx, stmt, tx, item)
 	}
 
 	if err = tx.Commit(); err != nil {
