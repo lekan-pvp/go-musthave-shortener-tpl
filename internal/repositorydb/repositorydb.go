@@ -55,8 +55,6 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 		return "", errors.New("you haven`t open the database connection")
 	}
 
-	//ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
-	//defer cancel()
 	var result string
 
 	log.Println("IN InsertUserRepo short url =", shortURL)
@@ -86,9 +84,6 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 
 	db := s.DB
 
-	//ctx, stop := context.WithTimeout(ctx, 1*time.Second)
-	//defer stop()
-
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
 	err := db.QueryRowContext(ctx, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
@@ -110,9 +105,6 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 	var user []models.URLs
 
 	db := s.DB
-
-	//ctx, stop := context.WithTimeout(ctx, 1*time.Second)
-	//defer stop()
 
 	rows, err := db.QueryContext(ctx, `SELECT user_id, short_url, orig_url FROM users WHERE user_id=$1`, uuid)
 	if err != nil {
@@ -210,9 +202,6 @@ func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan s
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
 	n := len(shortBases)
-
-	//ctx, cancel := context.WithCancel(ctx)
-	//defer cancel()
 
 	tx, err := s.DB.Begin()
 	if err != nil {

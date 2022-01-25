@@ -10,7 +10,6 @@ import (
 )
 
 func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request) {
-	var in []string
 	cookie, err := r.Cookie("token")
 	if err != nil || !cookieserver.CheckCookie(cookie) {
 		cookie = cookieserver.CreateCookie()
@@ -33,15 +32,15 @@ func (service *Controller) UpdateHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = json.Unmarshal(body, &in)
-	if err != nil {
+	var in []string
+
+	if err = json.Unmarshal(body, &in); err != nil {
 		log.Println("decoding json error...")
 		http.Error(w, err.Error(), 500)
 		return
 	}
 
-	err = service.UpdateURLs(r.Context(), in)
-	if err != nil {
+	if err = service.UpdateURLs(r.Context(), in); err != nil {
 		log.Println("update db error")
 		http.Error(w, err.Error(), 500)
 		return
