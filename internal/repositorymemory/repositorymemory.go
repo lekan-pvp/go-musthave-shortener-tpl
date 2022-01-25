@@ -127,6 +127,6 @@ func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, shortURLs []strin
 	return nil
 }
 
-func (s *MemoryRepository) DeleteItemRepo(ctx context.Context, short string) error {
-	return nil
-}
+//func (s *MemoryRepository) DeleteItemRepo(ctx context.Context, short string) error {
+//	return nil
+//}

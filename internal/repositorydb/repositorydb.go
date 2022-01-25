@@ -248,20 +248,20 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	return nil
 }
 
-func (s *DBRepository) DeleteItemRepo(ctx context.Context, short string) error {
-	db := s.DB
-
-	if db == nil {
-		log.Println("You haven`t open the database connection")
-		return errors.New("you haven`t open the database connection")
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
-	defer cancel()
-
-	_, err := db.ExecContext(ctx, `DELETE FROM users WHERE short_url=$1`, short)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (s *DBRepository) DeleteItemRepo(ctx context.Context, short string) error {
+//	db := s.DB
+//
+//	if db == nil {
+//		log.Println("You haven`t open the database connection")
+//		return errors.New("you haven`t open the database connection")
+//	}
+//
+//	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+//	defer cancel()
+//
+//	_, err := db.ExecContext(ctx, `DELETE FROM users WHERE short_url=$1`, short)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}

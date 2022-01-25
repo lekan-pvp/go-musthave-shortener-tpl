@@ -15,5 +15,5 @@ type Storager interface {
 	BanchAPIRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 	UpdateURLsRepo(ctx context.Context, shortURLs []string) error
 	//DeleteURLsRepo(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
-	DeleteItemRepo(ctx context.Context, short string) error
+	//DeleteItemRepo(ctx context.Context, short string) error
 }

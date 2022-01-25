@@ -13,5 +13,5 @@ type Servicer interface {
 	BanchAPI(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error)
 	UpdateURLs(ctx context.Context, shortBase []string) error
 	//DeleteURLs(ctx context.Context, uuid string, short string, errCh chan<- error, wg *sync.WaitGroup)
-	DeleteItem(ctx context.Context, short string) error
+	//DeleteItem(ctx context.Context, short string) error
 }

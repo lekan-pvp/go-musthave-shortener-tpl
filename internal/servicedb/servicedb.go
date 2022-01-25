@@ -58,10 +58,10 @@ func (service *Service) UpdateURLs(ctx context.Context, shortBases []string) err
 	return nil
 }
 
-func (service *Service) DeleteItem(ctx context.Context, short string) error {
-	err := service.DeleteItemRepo(ctx, short)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+//func (service *Service) DeleteItem(ctx context.Context, short string) error {
+//	err := service.DeleteItemRepo(ctx, short)
+//	if err != nil {
+//		return err
+//	}
+//	return nil
+//}

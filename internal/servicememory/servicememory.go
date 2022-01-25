@@ -40,6 +40,6 @@ func (service *Service) UpdateURLs(ctx context.Context, shortBase []string) erro
 	return err
 }
 
-func (service *Service) DeleteItem(ctx context.Context, short string) error {
-	return nil
-}
+//func (service *Service) DeleteItem(ctx context.Context, short string) error {
+//	return nil
+//}
