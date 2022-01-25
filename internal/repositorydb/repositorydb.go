@@ -55,8 +55,8 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 		return "", errors.New("you haven`t open the database connection")
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
-	defer cancel()
+	//ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	//defer cancel()
 	var result string
 
 	log.Println("IN InsertUserRepo short url =", shortURL)
@@ -86,12 +86,12 @@ func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) 
 
 	db := s.DB
 
-	ctx2, stop := context.WithTimeout(ctx, 1*time.Second)
-	defer stop()
+	//ctx, stop := context.WithTimeout(ctx, 1*time.Second)
+	//defer stop()
 
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
-	err := db.QueryRowContext(ctx2, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
+	err := db.QueryRowContext(ctx, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
 	if err != nil {
 		return "", err
 	}
@@ -111,10 +111,10 @@ func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]mode
 
 	db := s.DB
 
-	ctx2, stop := context.WithTimeout(ctx, 1*time.Second)
-	defer stop()
+	//ctx, stop := context.WithTimeout(ctx, 1*time.Second)
+	//defer stop()
 
-	rows, err := db.QueryContext(ctx2, `SELECT user_id, short_url, orig_url FROM users WHERE user_id=$1`, uuid)
+	rows, err := db.QueryContext(ctx, `SELECT user_id, short_url, orig_url FROM users WHERE user_id=$1`, uuid)
 	if err != nil {
 		return nil, err
 	}
@@ -170,26 +170,6 @@ func (s *DBRepository) BanchAPIRepo(ctx context.Context, uuid string, in []model
 	return result, nil
 }
 
-//func fanIn(inputChs ...chan string) chan string {
-//	outCh := make(chan string)
-//	go func() {
-//		wg := &sync.WaitGroup{}
-//
-//		for _, inputCh := range inputChs {
-//			wg.Add(1)
-//			go func(inputCh chan string) {
-//				defer wg.Done()
-//				for item := range inputCh {
-//					outCh <- item
-//				}
-//			}(inputCh)
-//		}
-//		wg.Wait()
-//		close(outCh)
-//	}()
-//	return outCh
-//}
-
 func fanOut(input []string, n int) []chan string {
 	chs := make([]chan string, 0, n)
 	for i, val := range input {
@@ -231,8 +211,8 @@ func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan s
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
 	n := len(shortBases)
 
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	//ctx, cancel := context.WithCancel(ctx)
+	//defer cancel()
 
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -264,7 +244,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
-		cancel()
+		//cancel()
 		return err
 	}
 
