@@ -29,7 +29,7 @@ func (s *DBRepository) New(cfg *config.Config) {
 	ctx, stop := context.WithTimeout(context.Background(), 1*time.Second)
 	defer stop()
 
-	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted VARCHAR(10) DEFAULT '', PRIMARY KEY (id), UNIQUE (orig_url));`)
+	result, err := db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS users(id SERIAL, user_id VARCHAR, short_url VARCHAR NOT NULL, orig_url VARCHAR NOT NULL, correlation_id VARCHAR, is_deleted BOOLEAN DEFAULT FALSE, PRIMARY KEY (id), UNIQUE (orig_url));`)
 	if err != nil {
 		log.Fatal("error create table in DB", err)
 	}
@@ -73,33 +73,29 @@ func (s *DBRepository) InsertUserRepo(ctx context.Context, userID string, shortU
 	return shortURL, nil
 }
 
-func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (string, error) {
+func (s *DBRepository) GetOrigByShortRepo(ctx context.Context, shortURL string) (*models.OriginLink, error) {
 	log.Println("IN DB:")
-	var result string
-	var deleted string
+	result := models.OriginLink{}
 	if s.DB == nil {
 		log.Println("You haven`t open the database connection")
-		return "", errors.New("you haven`t open the database connection")
+		return nil, errors.New("you haven`t open the database connection")
 	}
 
 	db := s.DB
 
 	log.Println("In GetOrigByShortRepo: short url =", shortURL)
 
-	err := db.QueryRowContext(ctx, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result, &deleted)
+	err := db.QueryRowContext(ctx, `SELECT orig_url, is_deleted FROM users WHERE short_url=$1;`, shortURL).Scan(&result.Link, &result.Deleted)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	log.Printf("result=%s, deleted=%s", result, deleted)
+	log.Printf("result=%s, deleted=%t", result.Link, result.IsDeleted())
 
-	if deleted == "deleted" {
-		result = deleted
-	}
-
-	return result, nil
+	return &result, nil
 }
 
+//GetURLsListRepo...
 func (s *DBRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]models.URLs, error) {
 	log.Println("IN DB:")
 	var user []models.URLs
@@ -182,7 +178,7 @@ func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan s
 				select {
 				case errCh <- defErr:
 				case <-ctx.Done():
-					log.Println("aborting dalate")
+					log.Println("aborting dalete")
 				}
 			}
 			wg.Done()
@@ -214,7 +210,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	fanOutChs := fanOut(shortBases, n)
 
-	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted='deleted' WHERE short_url=$1`)
+	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=TRUE WHERE short_url=$1`)
 	if err != nil {
 		return err
 	}

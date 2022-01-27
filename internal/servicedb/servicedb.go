@@ -18,10 +18,11 @@ func (service *Service) InsertUser(ctx context.Context, userID string, shortURL 
 	return short, nil
 }
 
-func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (string, error) {
+func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (*models.OriginLink, error) {
+	result := &models.OriginLink{}
 	result, err := service.GetOrigByShortRepo(ctx, shortURL)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return result, nil
 }
@@ -57,11 +58,3 @@ func (service *Service) UpdateURLs(ctx context.Context, shortBases []string) err
 	}
 	return nil
 }
-
-//func (service *Service) DeleteItem(ctx context.Context, short string) error {
-//	err := service.DeleteItemRepo(ctx, short)
-//	if err != nil {
-//		return err
-//	}
-//	return nil
-//}

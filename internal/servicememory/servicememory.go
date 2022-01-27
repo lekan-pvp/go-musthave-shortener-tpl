@@ -15,7 +15,8 @@ func (service *Service) InsertUser(ctx context.Context, userID string, shortURL 
 	return result, err
 }
 
-func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (string, error) {
+func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (*models.OriginLink, error) {
+	result := &models.OriginLink{}
 	result, err := service.GetOrigByShortRepo(ctx, shortURL)
 	return result, err
 }
@@ -39,7 +40,3 @@ func (service *Service) UpdateURLs(ctx context.Context, shortBase []string) erro
 	err := service.UpdateURLsRepo(ctx, shortBase)
 	return err
 }
-
-//func (service *Service) DeleteItem(ctx context.Context, short string) error {
-//	return nil
-//}

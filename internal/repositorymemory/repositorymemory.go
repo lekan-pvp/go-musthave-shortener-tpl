@@ -67,16 +67,19 @@ func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]
 	return user, nil
 }
 
-func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (string, error) {
+func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (*models.OriginLink, error) {
 	log.Println("IN MEM: GetOrigByShortRepo")
+	result := models.OriginLink{}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, v := range s.users {
 		if v.ShortURL == short {
-			return v.OriginalURL, nil
+			result.Link = v.OriginalURL
+			result.Deleted = v.DeleteFlag
+			return &result, nil
 		}
 	}
-	return "", errors.New("short URL not found")
+	return nil, errors.New("short URL not found")
 }
 
 func (s *MemoryRepository) save(uuid string, short, orig string) error {
@@ -127,6 +130,3 @@ func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, shortURLs []strin
 	return nil
 }
 
-//func (s *MemoryRepository) DeleteItemRepo(ctx context.Context, short string) error {
-//	return nil
-//}
