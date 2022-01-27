@@ -6,5 +6,5 @@ type OriginLink struct {
 }
 
 func (l OriginLink) IsDeleted() bool {
-	return l.Deleted == true
+	return l.Deleted
 }

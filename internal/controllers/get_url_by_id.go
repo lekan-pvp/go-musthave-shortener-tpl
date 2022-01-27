@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"log"
 	"net/http"
 )
@@ -15,8 +14,6 @@ func (service *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(short)
-
-	orig := &models.OriginLink{}
 
 	orig, err := service.GetOrigByShort(r.Context(), short)
 	if err != nil {

@@ -19,7 +19,6 @@ func (service *Service) InsertUser(ctx context.Context, userID string, shortURL 
 }
 
 func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (*models.OriginLink, error) {
-	result := &models.OriginLink{}
 	result, err := service.GetOrigByShortRepo(ctx, shortURL)
 	if err != nil {
 		return nil, err
