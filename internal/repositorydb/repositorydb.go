@@ -10,6 +10,7 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -202,15 +203,19 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	errCh := make(chan error)
 	jobs := make(chan string, n)
+	var wg sync.WaitGroup
 
 	for i := 1; i <= 3; i++ {
+		wg.Add(1)
 		go func(){
+			defer wg.Done()
 			err := newWorker(ctx, stmt, tx, jobs)
 			if err != nil {
 				errCh <- err
 			}
 		}()
 	}
+	wg.Wait()
 
 
 	for _, item := range fanOutChs {
