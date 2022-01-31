@@ -209,15 +209,22 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	wg := sync.WaitGroup{}
 	errCh := make(chan error)
-	for _, item := range fanOutChs {
+	jobs := make(chan string, n)
+
+	for i := 1; i <= 3; i++ {
 		wg.Add(1)
-		go func(itm chan string) {
-			err := newWorker(ctx, stmt, tx, itm)
+		go func() {
+			err := newWorker(ctx, stmt, tx, jobs)
 			errCh <- err
 			defer wg.Done()
-		}(item)
+		}()
 	}
 	wg.Wait()
+
+	for _, item := range fanOutChs {
+		jobs <- <-item
+	}
+	close(jobs)
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
