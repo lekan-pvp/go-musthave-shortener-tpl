@@ -216,16 +216,15 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 			return nil
 		})
 	}
-	if err := g.Wait(); err != nil {
-		return err
-	}
-
-
 
 	for _, item := range fanOutChs {
 		jobs <- <-item
 	}
 	close(jobs)
+
+	if err := g.Wait(); err != nil {
+		return err
+	}
 
 	if err = tx.Commit(); err != nil {
 		return err
