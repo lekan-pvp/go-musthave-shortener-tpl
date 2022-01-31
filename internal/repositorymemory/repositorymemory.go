@@ -129,4 +129,3 @@ func (s *MemoryRepository) BanchAPIRepo(ctx context.Context, uuid string, in []m
 func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, shortURLs []string) error {
 	return nil
 }
-

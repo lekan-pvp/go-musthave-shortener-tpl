@@ -1,7 +1,7 @@
 package models
 
 type OriginLink struct {
-	Link string
+	Link    string
 	Deleted bool
 }
 

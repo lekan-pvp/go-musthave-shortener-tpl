@@ -10,7 +10,6 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -169,35 +168,31 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string, errCh chan<- error, wg *sync.WaitGroup) {
-	wg.Add(1)
-	go func() {
-		var defErr error
-		defer func() {
-			if defErr != nil {
-				select {
-				case errCh <- defErr:
-				case <-ctx.Done():
-					log.Println("aborting dalete")
-				}
-			}
-			wg.Done()
-		}()
-		for id := range inputCh {
-			if _, err := stmt.ExecContext(ctx, id); err != nil {
-				if err = tx.Rollback(); err != nil {
-					defErr = err
-					return
-				}
-				defErr = err
-				return
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string, errCh chan<- error) {
+	var defErr error
+	defer func() {
+		if defErr != nil {
+			select {
+			case errCh <- defErr:
+			case <-ctx.Done():
+				log.Println("aborting dalete")
 			}
 		}
 	}()
+	for id := range inputCh {
+		if _, err := stmt.ExecContext(ctx, id); err != nil {
+			if err = tx.Rollback(); err != nil {
+				defErr = err
+				return
+			}
+			defErr = err
+			return
+		}
+	}
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
-	n := len(shortBases)
+	numJobs := len(shortBases)
 
 	tx, err := s.DB.Begin()
 	if err != nil {
@@ -208,7 +203,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		return errors.New("the list of URLs is empty")
 	}
 
-	fanOutChs := fanOut(shortBases, n)
+	fanOutChs := fanOut(shortBases, numJobs)
 
 	stmt, err := tx.PrepareContext(ctx, `UPDATE users SET is_deleted=TRUE WHERE short_url=$1`)
 	if err != nil {
@@ -216,20 +211,18 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	defer stmt.Close()
 
-	wg := &sync.WaitGroup{}
 	errCh := make(chan error)
-	for _, item := range fanOutChs {
-		newWorker(ctx, stmt, tx, item, errCh, wg)
+	jobs := make(chan string, numJobs)
+	for i := 0; i < numJobs; i++ {
+		go newWorker(ctx, stmt, tx, jobs, errCh)
 	}
 
-	go func() {
-		wg.Wait()
-		close(errCh)
-	}()
+	for _, item := range fanOutChs {
+		jobs <- <-item
+	}
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
-		//cancel()
 		return err
 	}
 
