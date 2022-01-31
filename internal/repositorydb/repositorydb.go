@@ -217,7 +217,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 			}
 		}()
 	}
-	wg.Wait()
+
 
 
 	for _, item := range fanOutChs {
@@ -225,6 +225,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	close(jobs)
 
+	wg.Wait()
 	if err = <-errCh; err != nil {
 		log.Println(err)
 		return err
