@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/go-musthave-shortener-tpl/internal/config"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
 )
 
 type Controller struct {

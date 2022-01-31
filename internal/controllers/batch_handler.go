@@ -2,21 +2,21 @@ package controllers
 
 import (
 	"encoding/json"
-	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieserver"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"io"
 	"net/http"
 	"strings"
 )
 
-func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) APIShortenBatch(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 
 	in := make([]models.BatchIn, 0)
 
 	cookie, err := r.Cookie("token")
-	if err != nil || !cookie_handler.CheckCookie(cookie) {
-		cookie = cookie_handler.CreateCookie()
+	if err != nil || !cookieserver.CheckCookie(cookie) {
+		cookie = cookieserver.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)
@@ -37,7 +37,7 @@ func (controller *Controller) ApiShortenBatch(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	result, err := controller.BanchApi(r.Context(), uuid, in, controller.Cfg.BaseURL)
+	result, err := service.BanchAPI(r.Context(), uuid, in, service.Cfg.BaseURL)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

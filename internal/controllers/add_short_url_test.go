@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/go-chi/chi"
-	"github.com/go-musthave-shortener-tpl/internal/test_helper"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/testhelper"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,19 +19,27 @@ func TestURLsController_AddURL(t *testing.T) {
 	ts := httptest.NewServer(r)
 	defer ts.Close()
 
-	if _, body := test_helper.TestRequest(t, ts, "POST", "/", nil); string(body) != "http://localhost:8080/whTHc" {
+	res, body := testhelper.TestRequest(t, ts, "POST", "/", nil)
+	defer res.Body.Close()
+	if string(body) != "http://localhost:8080/whTHc" {
 		t.Fatalf("want %s, got %s", "http://localhost:8080/whTHc", string(body))
 	}
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/", nil); res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
+	res, _ = testhelper.TestRequest(t, ts, "POST", "/", nil)
+	defer res.Body.Close()
+	if res.Header.Get("Content-Type") != "text/plain; charset=utf-8" {
 		t.Fatalf("want %s, got %s", "text/plain; charset=utf-8", res.Header.Get("Content-Type"))
 	}
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/", nil); res.StatusCode != 201 {
+	res, _ = testhelper.TestRequest(t, ts, "POST", "/", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 201 {
 		t.Fatalf("want %d, got %d", 201, res.StatusCode)
 	}
 
-	if res, _ := test_helper.TestRequest(t, ts, "POST", "/somewrong", nil); res.StatusCode != 404 {
+	res, _ = testhelper.TestRequest(t, ts, "POST", "/somewrong", nil)
+	defer res.Body.Close()
+	if res.StatusCode != 404 {
 		t.Fatalf("want %d, got %d", 404, res.StatusCode)
 	}
 }

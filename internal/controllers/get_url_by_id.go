@@ -6,8 +6,7 @@ import (
 	"net/http"
 )
 
-func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
-	log.Printf("IN GetURLByID controller is %T", controller)
+func (service *Controller) GetURLByID(w http.ResponseWriter, r *http.Request) {
 	short := chi.URLParam(r, "articleID")
 	if short == "" {
 		http.Error(w, "url is empty", 404)
@@ -16,22 +15,28 @@ func (controller *Controller) GetURLByID(w http.ResponseWriter, r *http.Request)
 
 	log.Println(short)
 
-	orig, err := controller.GetOrigByShort(r.Context(), short)
-	log.Println("ORIG:", orig)
+	orig, err := service.GetOrigByShort(r.Context(), short)
 	if err != nil {
 		log.Println("IN ERR HANDLER GetOrigByShort")
 		http.Error(w, err.Error(), 404)
 		return
 	}
 
-	if orig == "" {
+	if orig == nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	log.Printf("In get_url_by_id: %s\n", orig)
+	if !orig.IsDeleted() {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Location", orig.Link)
+		w.WriteHeader(http.StatusTemporaryRedirect)
+		return
+	}
 
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("Location", orig)
-	w.WriteHeader(http.StatusTemporaryRedirect)
+	if orig.IsDeleted() {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.WriteHeader(410)
+		return
+	}
 }

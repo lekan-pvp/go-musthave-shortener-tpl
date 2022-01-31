@@ -1,9 +1,9 @@
-package service_db
+package servicedb
 
 import (
 	"context"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 )
 
 type Service struct {
@@ -18,10 +18,10 @@ func (service *Service) InsertUser(ctx context.Context, userID string, shortURL 
 	return short, nil
 }
 
-func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (string, error) {
+func (service *Service) GetOrigByShort(ctx context.Context, shortURL string) (*models.OriginLink, error) {
 	result, err := service.GetOrigByShortRepo(ctx, shortURL)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	return result, nil
 }
@@ -42,10 +42,18 @@ func (service *Service) CheckPing(ctx context.Context) error {
 	return nil
 }
 
-func (service *Service) BanchApi(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
-	result, err := service.BanchApiRepo(ctx, uuid, in, shortBase)
+func (service *Service) BanchAPI(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	result, err := service.BanchAPIRepo(ctx, uuid, in, shortBase)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
+}
+
+func (service *Service) UpdateURLs(ctx context.Context, shortBases []string) error {
+	err := service.UpdateURLsRepo(ctx, shortBases)
+	if err != nil {
+		return err
+	}
+	return nil
 }

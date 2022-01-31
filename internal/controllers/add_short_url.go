@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
-	"github.com/go-musthave-shortener-tpl/internal/cookie_handler"
-	"github.com/go-musthave-shortener-tpl/internal/key_gen"
 	"github.com/jackc/pgerrcode"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/cookieserver"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lib/pq"
 	"io"
 	"net/http"
@@ -12,14 +12,14 @@ import (
 	"time"
 )
 
-func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
+func (service *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	var uuid string
 	var cookie *http.Cookie
 	var err error
 
 	cookie, err = r.Cookie("token")
-	if err != nil || !cookie_handler.CheckCookie(cookie) {
-		cookie = cookie_handler.CreateCookie()
+	if err != nil || !cookieserver.CheckCookie(cookie) {
+		cookie = cookieserver.CreateCookie()
 	}
 
 	http.SetCookie(w, cookie)
@@ -40,8 +40,8 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 	orig := string(body)
 
 	status := http.StatusCreated
-	short := key_gen.GenerateShortLink(orig, uuid)
-	short, err = controller.InsertUser(ctx, uuid, short, orig)
+	short := keygen.GenerateShortLink(orig, uuid)
+	short, err = service.InsertUser(ctx, uuid, short, orig)
 	if err != nil {
 		if err.(*pq.Error).Code == pgerrcode.UniqueViolation {
 			status = http.StatusConflict
@@ -53,5 +53,5 @@ func (controller *Controller) AddURL(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.WriteHeader(status)
-	w.Write([]byte(controller.Cfg.BaseURL + "/" + short))
+	w.Write([]byte(service.Cfg.BaseURL + "/" + short))
 }

@@ -1,13 +1,13 @@
-package repository_memory
+package repositorymemory
 
 import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/go-musthave-shortener-tpl/internal/config"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
-	"github.com/go-musthave-shortener-tpl/internal/key_gen"
-	"github.com/go-musthave-shortener-tpl/internal/models"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	_ "github.com/lib/pq"
 	"io"
 	"log"
@@ -67,16 +67,19 @@ func (s *MemoryRepository) GetURLsListRepo(ctx context.Context, uuid string) ([]
 	return user, nil
 }
 
-func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (string, error) {
+func (s *MemoryRepository) GetOrigByShortRepo(ctx context.Context, short string) (*models.OriginLink, error) {
 	log.Println("IN MEM: GetOrigByShortRepo")
+	result := models.OriginLink{}
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for _, v := range s.users {
 		if v.ShortURL == short {
-			return v.OriginalURL, nil
+			result.Link = v.OriginalURL
+			result.Deleted = v.DeleteFlag
+			return &result, nil
 		}
 	}
-	return "", errors.New("short URL not found")
+	return nil, errors.New("short URL not found")
 }
 
 func (s *MemoryRepository) save(uuid string, short, orig string) error {
@@ -112,13 +115,17 @@ func (s *MemoryRepository) CheckPingRepo(ctx context.Context) error {
 	return nil
 }
 
-func (s *MemoryRepository) BanchApiRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
-	log.Println("BanchApiRepo IN MEMORY:")
+func (s *MemoryRepository) BanchAPIRepo(ctx context.Context, uuid string, in []models.BatchIn, shortBase string) ([]models.BatchResult, error) {
+	log.Println("BanchAPIRepo IN MEMORY:")
 	result := make([]models.BatchResult, 0)
 	for _, v := range in {
-		short := key_gen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
+		short := keygen.GenerateShortLink(v.OriginalURL, v.CorrelationID)
 		result = append(result, models.BatchResult{CorrelationID: v.CorrelationID, ShortURL: shortBase + "/" + short})
 		s.users = append(s.users, models.URLs{UUID: uuid, ShortURL: short, OriginalURL: v.OriginalURL, CorrelationID: v.CorrelationID})
 	}
 	return result, nil
+}
+
+func (s *MemoryRepository) UpdateURLsRepo(ctx context.Context, shortURLs []string) error {
+	return nil
 }

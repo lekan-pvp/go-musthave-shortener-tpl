@@ -3,13 +3,13 @@ package server
 import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-musthave-shortener-tpl/internal/config"
-	"github.com/go-musthave-shortener-tpl/internal/controllers"
-	"github.com/go-musthave-shortener-tpl/internal/interfaces"
-	"github.com/go-musthave-shortener-tpl/internal/mware"
-	repository_db "github.com/go-musthave-shortener-tpl/internal/repository-db"
-	repository_memory "github.com/go-musthave-shortener-tpl/internal/repository-memory"
-	"github.com/go-musthave-shortener-tpl/internal/service-memory"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/config"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/controllers"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/interfaces"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/mware"
+	repository_db "github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/repositorydb"
+	repository_memory "github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/repositorymemory"
+	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/servicememory"
 	"log"
 	"net/http"
 )
@@ -21,8 +21,8 @@ func Run() {
 
 	repo.New(cfg)
 
-	service := &service_memory.Service{repo}
-	controller := controllers.Controller{service, cfg}
+	service := &servicememory.Service{Storager: repo}
+	controller := controllers.Controller{Servicer: service, Cfg: cfg}
 
 	router := chi.NewRouter()
 
@@ -34,7 +34,10 @@ func Run() {
 	router.With(mware.GzipHandle).Get("/{articleID}", controller.GetURLByID)
 	router.Route("/api/shorten", func(r chi.Router) {
 		r.With(mware.RequestHandle, mware.GzipHandle).Post("/", controller.APIShorten)
-		r.Post("/batch", controller.ApiShortenBatch)
+		r.Post("/batch", controller.APIShortenBatch)
+	})
+	router.Route("/api/user", func(r chi.Router) {
+		r.Delete("/urls", controller.UpdateHandler)
 	})
 
 	log.Println("creating router...")
