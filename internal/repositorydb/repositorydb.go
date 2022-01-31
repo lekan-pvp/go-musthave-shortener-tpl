@@ -210,6 +210,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	wg := sync.WaitGroup{}
 	errCh := make(chan error)
 	for _, item := range fanOutChs {
+		wg.Add(1)
 		go func() {
 			err := newWorker(ctx, stmt, tx, item)
 			errCh <- err
@@ -217,11 +218,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		}()
 
 	}
-
-	go func() {
-		wg.Wait()
-		close(errCh)
-	}()
+	wg.Wait()
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
