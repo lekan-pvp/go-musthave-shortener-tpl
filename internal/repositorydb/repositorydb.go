@@ -217,6 +217,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		go newWorker(ctx, stmt, tx, jobs, errCh)
 	}
 
+
 	for _, item := range fanOutChs {
 		jobs <- <-item
 	}
