@@ -216,7 +216,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		}()
 	}
 	wg.Wait()
-
+	close(errCh)
 
 	for _, item := range fanOutChs {
 		jobs <- <-item
