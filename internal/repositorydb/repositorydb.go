@@ -183,6 +183,7 @@ func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan stri
 		return nil
 }
 
+// UpdateURLsRepo..
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
 	n := len(shortBases)
 
