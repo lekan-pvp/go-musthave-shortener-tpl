@@ -213,13 +213,14 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	errCh := make(chan error)
 	jobs := make(chan string, numJobs)
-	for i := 0; i < numJobs; i++ {
+	for i := 0; i < 3; i++ {
 		go newWorker(ctx, stmt, tx, jobs, errCh)
 	}
 
 	for _, item := range fanOutChs {
 		jobs <- <-item
 	}
+	close(jobs)
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
