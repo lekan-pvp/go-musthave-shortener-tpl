@@ -169,31 +169,22 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string, errCh chan<- error, wg *sync.WaitGroup) {
-	wg.Add(1)
-	go func() {
-		var defErr error
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string) error {
 		defer func() {
-			if defErr != nil {
-				select {
-				case errCh <- defErr:
-				case <-ctx.Done():
-					log.Println("aborting dalete")
+			select {
+			case <-ctx.Done():
+				log.Println("aborting dalete:", ctx.Err())
 				}
-			}
-			wg.Done()
 		}()
 		for id := range inputCh {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
-					defErr = err
-					return
-				}
-				defErr = err
-				return
+						return err
+					}
+				return err
 			}
 		}
-	}()
+		return nil
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
@@ -215,12 +206,22 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		return err
 	}
 	defer stmt.Close()
+
 	wg := sync.WaitGroup{}
 	errCh := make(chan error)
 	for _, item := range fanOutChs {
-		newWorker(ctx, stmt, tx, item, errCh, &wg)
+		go func() {
+			err := newWorker(ctx, stmt, tx, item)
+			errCh <- err
+			defer wg.Done()
+		}()
+
 	}
-	
+
+	go func() {
+		wg.Wait()
+		close(errCh)
+	}()
 
 	if err = <-errCh; err != nil {
 		log.Println(err)
