@@ -206,10 +206,12 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	for i := 1; i <= 3; i++ {
 		go func(){
 			err := newWorker(ctx, stmt, tx, jobs)
-			errCh <- err
+			if err != nil {
+				errCh <- err
+			}
 		}()
 	}
-	close(errCh)
+
 
 	for _, item := range fanOutChs {
 		jobs <- <-item
