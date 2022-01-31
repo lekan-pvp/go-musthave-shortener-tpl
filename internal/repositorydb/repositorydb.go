@@ -9,6 +9,7 @@ import (
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/keygen"
 	"github.com/lekan-pvp/go-musthave-shortener-tpl.git/internal/models"
 	"github.com/lib/pq"
+	"golang.org/x/sync/errgroup"
 	"log"
 	"sync"
 	"time"
@@ -169,18 +170,18 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan string){
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan string) error{
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 		for id := range jobs {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
-						return
+						return err
 					}
-				return
+				return err
 			}
 		}
-		return
+		return nil
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
@@ -203,16 +204,23 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	defer stmt.Close()
 
-	//errCh := make(chan error)
 	jobs := make(chan string, n)
 	var wg sync.WaitGroup
+	g, ctx := errgroup.WithContext(ctx)
 
 	for i := 1; i <= 3; i++ {
 		wg.Add(1)
-		go func(){
+		g.Go(func() error{
 			defer wg.Done()
-			newWorker(ctx, stmt, tx, jobs)
-		}()
+			err = newWorker(ctx, stmt, tx, jobs)
+			if err != nil {
+				return err
+			}
+			return nil
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return err
 	}
 
 
@@ -223,11 +231,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	close(jobs)
 
 	wg.Wait()
-	//if err = <-errCh; err != nil {
-	//	log.Println(err)
-	//	return err
-	//}
-	//close(errCh)
 
 	if err = tx.Commit(); err != nil {
 		return err
