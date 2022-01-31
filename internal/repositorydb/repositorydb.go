@@ -11,7 +11,6 @@ import (
 	"github.com/lib/pq"
 	"golang.org/x/sync/errgroup"
 	"log"
-	"sync"
 	"time"
 )
 
@@ -205,13 +204,11 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	defer stmt.Close()
 
 	jobs := make(chan string, n)
-	var wg sync.WaitGroup
+
 	g, ctx := errgroup.WithContext(ctx)
 
 	for i := 1; i <= 3; i++ {
-		wg.Add(1)
 		g.Go(func() error{
-			defer wg.Done()
 			err = newWorker(ctx, stmt, tx, jobs)
 			if err != nil {
 				return err
@@ -229,8 +226,6 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		jobs <- <-item
 	}
 	close(jobs)
-
-	wg.Wait()
 
 	if err = tx.Commit(); err != nil {
 		return err
