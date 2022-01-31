@@ -207,7 +207,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	defer stmt.Close()
 
 	errCh := make(chan error)
-	jobs := make(chan string)
+	jobs := make(chan string, n)
 
 	for i := 1; i <= 3; i++ {
 		go func() {
