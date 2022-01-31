@@ -169,12 +169,6 @@ func fanOut(input []string, n int) []chan string {
 }
 
 func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string) error {
-		defer func() {
-			select {
-			case <-ctx.Done():
-				log.Println("aborting dalete:", ctx.Err())
-				}
-		}()
 		for id := range inputCh {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
