@@ -211,12 +211,11 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	errCh := make(chan error)
 	for _, item := range fanOutChs {
 		wg.Add(1)
-		go func() {
-			err := newWorker(ctx, stmt, tx, item)
+		go func(itm chan string) {
+			err := newWorker(ctx, stmt, tx, itm)
 			errCh <- err
 			defer wg.Done()
-		}()
-
+		}(item)
 	}
 	wg.Wait()
 
