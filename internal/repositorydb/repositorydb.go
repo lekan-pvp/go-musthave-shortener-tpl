@@ -205,7 +205,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 
 	jobs := make(chan string, n)
 
-	g, ctx := errgroup.WithContext(ctx)
+	g, _ := errgroup.WithContext(ctx)
 
 	for i := 1; i <= 3; i++ {
 		g.Go(func() error{
