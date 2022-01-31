@@ -169,8 +169,10 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, inputCh <-chan string) error {
-		for id := range inputCh {
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+		for id := range jobs {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
 						return err
