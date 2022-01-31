@@ -169,18 +169,18 @@ func fanOut(input []string, n int) []chan string {
 	return chs
 }
 
-func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan string) error {
+func newWorker(ctx context.Context, stmt *sql.Stmt, tx *sql.Tx, jobs <-chan string){
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 		for id := range jobs {
 			if _, err := stmt.ExecContext(ctx, id); err != nil {
 				if err = tx.Rollback(); err != nil {
-						return err
+						return
 					}
-				return err
+				return
 			}
 		}
-		return nil
+		return
 }
 
 func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) error {
@@ -203,7 +203,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	}
 	defer stmt.Close()
 
-	errCh := make(chan error)
+	//errCh := make(chan error)
 	jobs := make(chan string, n)
 	var wg sync.WaitGroup
 
@@ -211,10 +211,7 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 		wg.Add(1)
 		go func(){
 			defer wg.Done()
-			err := newWorker(ctx, stmt, tx, jobs)
-			if err != nil {
-				errCh <- err
-			}
+			newWorker(ctx, stmt, tx, jobs)
 		}()
 	}
 
@@ -226,11 +223,11 @@ func (s *DBRepository) UpdateURLsRepo(ctx context.Context, shortBases []string) 
 	close(jobs)
 
 	wg.Wait()
-	if err = <-errCh; err != nil {
-		log.Println(err)
-		return err
-	}
-	close(errCh)
+	//if err = <-errCh; err != nil {
+	//	log.Println(err)
+	//	return err
+	//}
+	//close(errCh)
 
 	if err = tx.Commit(); err != nil {
 		return err
