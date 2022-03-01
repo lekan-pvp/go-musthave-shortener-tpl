@@ -34,7 +34,7 @@ func (s *MemoryRepository) New(cfg *config.Config) {
 }
 
 func (s *MemoryRepository) InsertUserRepo(ctx context.Context, userID string, shortURL string, origURL string) (string, error) {
-	log.Println("IN MEM: InsertUserRepo")
+	//log.Println("IN MEM: InsertUserRepo")
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.users = append(s.users, models.URLs{UUID: userID, ShortURL: shortURL, OriginalURL: origURL})

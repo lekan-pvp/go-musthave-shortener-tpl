@@ -10,7 +10,7 @@ import (
 type Config struct {
 	ServerAddress   string `env:"SERVER_ADDRESS" envDefault:"localhost:8080"`
 	BaseURL         string `env:"BASE_URL" envDefault:"http://localhost:8080"`
-	FileStoragePath string `env:"FILE_STORAGE_PATH" envDefault:""`
+	FileStoragePath string `env:"FILE_STORAGE_PATH" envDefault:"test.json"`
 	DatabaseDSN     string `env:"DATABASE_DSN" envDefault:"user=postgres password='postgres' dbname=pqgotest sslmode=disable"`
 }
 
